@@ -68,3 +68,6 @@ class WeatherPlugin(Plugin):
   def update_list(self):
     with open(os.path.join(self.get_plugin_dir(__file__), LIST_FILE), 'w') as j:
       j.write(dumps(self.lists, indent=2))
+
+
+  

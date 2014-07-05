@@ -1,6 +1,6 @@
 from plugin import *
 from network import STATUS_OK
-import json
+import json, random
 
 class StaticResponsePlugin(Plugin):
 
@@ -22,7 +22,9 @@ class StaticResponsePlugin(Plugin):
     phrase = [i for i in self.phrases if i in querystr]
     if len(phrase):
       longestphrase = sorted(phrase, key=lambda x: len(x))[-1]
-      self.resp["text"] = self.phrases[ longestphrase ]
+      ph = self.phrases[ longestphrase ]
+      if type(ph) == list: ph = random.choice(ph)
+      self.resp["text"] = ph
       self.resp["status"] = STATUS_OK
     else:
       self.resp["text"] = "phrase doesn't exist"
