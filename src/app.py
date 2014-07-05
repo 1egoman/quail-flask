@@ -92,6 +92,7 @@ class App(object):
         self.stack = self.stack[:-n]
 
     else:
+      # incorrect secret
       response = Packet()
       response["status"] = STATUS_ERR
       response["text"] = "incorrect secret"
@@ -99,7 +100,7 @@ class App(object):
 
     
     # return the response
-    return dumps(out)
+    return Response(dumps(out),  mimetype='application/json')
     
   def run(self):
 
