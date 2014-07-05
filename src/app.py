@@ -6,6 +6,7 @@ import os
 from network import Packet, STATUS_OK, STATUS_NO_HIT, STATUS_ERR
 from plugins import PluginManager
 from calender import Calender
+from files import UserFiles
 import wolfram
 import listener
 
@@ -109,7 +110,7 @@ class App(object):
     if request.method == 'POST':
       file = request.files['file']
       filename = secure_filename(file.filename)
-      if file:
+      if fileg:
         file.save(os.path.join(self.config["upload-folder"], filename))
 
         response["status"] = STATUS_OK
@@ -136,3 +137,4 @@ class App(object):
 
   def add_api_hooks(self):
     self.calender = Calender(self)
+    self.files = UserFiles(self)
