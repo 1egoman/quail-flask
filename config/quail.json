@@ -2,5 +2,6 @@
   "host": "0.0.0.0",
   "port": 8000,
   "secret": "abc",
+  "upload-folder": "uploads",
   "wa-api-key": "4W736E-Y82E88RJYQ"
 }

@@ -1,4 +1,5 @@
-from flask import Flask, Response, url_for, jsonify
+from flask import Flask, Response, url_for, jsonify, redirect, request
+from werkzeug.utils import secure_filename
 from json import dumps, loads
 import os
 
@@ -101,6 +102,19 @@ class App(object):
     
     # return the response
     return Response(dumps(out),  mimetype='application/json')
+
+  def upload_resource(self, secret): 
+    """ Upload a resource to quail so it can be parsed/used in a query """
+    response = Packet()
+    if request.method == 'POST':
+      file = request.files['file']
+      filename = secure_filename(file.filename)
+      if file:
+        file.save(os.path.join(self.config["upload-folder"], filename))
+
+        response["status"] = STATUS_OK
+        response["text"] = filename
+        return Response(dumps( response.format() ),  mimetype='application/json')
     
   def run(self):
 
@@ -110,6 +124,9 @@ class App(object):
     self.flask.add_url_rule("/v2/<secret>/query/<query>/<int:n>", "query", view_func=self.do_query)
     self.flask.add_url_rule("/v2/<secret>/query/<query>/use/<plugin_name>", "query", view_func=self.do_query)
     self.flask.add_url_rule("/v2/<secret>/query/<query>/use/<plugin_name>/<int:n>", "query", view_func=self.do_query)
+
+    # uploading of files
+    self.flask.add_url_rule("/v2/<secret>/upload", "upload", methods=["POST"], view_func=self.upload_resource)
 
     # run flask
     self.flask.run(host=self.config["host"], port=self.config["port"], debug=1)
