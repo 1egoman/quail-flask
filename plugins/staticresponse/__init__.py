@@ -9,8 +9,6 @@ class StaticResponsePlugin(Plugin):
 
   def validate(self): 
     # read phrases
-    with self.app.files.get("image.jpg", 'r') as f:
-      print f.read()
     with open(  os.path.join(self.get_plugin_dir(__file__), "phrases.json")  ) as f:
       self.phrases = json.loads( f.read() )
 
