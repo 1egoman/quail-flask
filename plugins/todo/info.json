@@ -1,0 +1,7 @@
+{
+  "name": "Todo",
+  "desc": "List management",
+  "author": "Ryan Gaus",
+  "twitter": "@rgausnet",
+  "plugin": "TodoPlugin"
+}

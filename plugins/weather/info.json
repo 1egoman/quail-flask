@@ -1,0 +1,8 @@
+{
+  "name": "Weather",
+  "shortname": "w",
+  "desc": "Um, it tells you the weather?",
+  "author": "Ryan Gaus",
+  "plugin": "WeatherPlugin",
+  "key": "e4b5f5d3042c07fc"
+}

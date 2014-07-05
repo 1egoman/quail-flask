@@ -1,0 +1,6 @@
+{
+  "name": "TestNotifier",
+  "desc": "testing push notifications",
+  "author": "Ryan Gaus",
+  "plugin": "TestNotificationPlugin"
+}

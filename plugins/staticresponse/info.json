@@ -1,0 +1,7 @@
+{
+  "name": "Static Parser",
+  "desc": "Parses static phrases sent to Quail",
+  "author": "Ryan Gaus",
+  "twitter": "@rgausnet",
+  "plugin": "StaticResponsePlugin"
+}

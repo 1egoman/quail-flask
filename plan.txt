@@ -1,0 +1,6 @@
+/v2/query?input=query&secret=bla
+
+
+
+- Quail:
+  - server
