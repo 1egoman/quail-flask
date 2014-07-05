@@ -33,7 +33,8 @@ class Plugin(object):
     return os.path.abspath( os.path.join("plugins", d) )
 
   def get_client_ip(self):
-   return request.remote_addr
+    """ Returns the client's IP address """
+    return request.remote_addr
 
 
 

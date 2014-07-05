@@ -7,9 +7,16 @@ import json
 def parse_weather(self, when, where, API_KEY):
 
 
-    # if there is no time, create one
+    conditions = None
+    today = False
+    # if there is no time, create one (means most likely that weather for today is requested)
     if not (type(when) == dict and when.has_key("when") and when["when"][2] != dt.datetime.now().day):
       when = {"when": [dt.datetime.now().year, dt.datetime.now().month, dt.datetime.now().day]}
+
+      # get today's conditions
+      u = urllib2.urlopen("http://api.wunderground.com/api/%s/conditions/q/autoip.json" % API_KEY)
+      todayconditions = json.loads( u.read() )["current_observation"]
+      today = True
 
     # get from api
     u = urllib2.urlopen("http://api.wunderground.com/api/%s/forecast10day/q/autoip.json" % API_KEY)
@@ -36,8 +43,10 @@ def parse_weather(self, when, where, API_KEY):
 
     # tempurature
     if "tempurature" in self.query:
-      t = (high+low)/2
-      self.resp["text"] = "%s degrees" % t
+      if today:
+        self.resp["text"] = "%s degrees" % todayconditions["feelslike_f"]
+      else:
+        self.resp["text"] = "high of %s degrees, and low of %s" % (high, low)
       return
 
 
@@ -59,7 +68,7 @@ def parse_weather(self, when, where, API_KEY):
     elif "rain" in self.query or "storm" in self.query or "snow" in self.query:
 
       # get when it is happening
-      if when["when"] == [dt.datetime.now().year, dt.datetime.now().month, dt.datetime.now().day]:
+      if today:
         p = "it is %sing"
       else:
         p = "it will %s"
@@ -75,14 +84,14 @@ def parse_weather(self, when, where, API_KEY):
     elif "sun" in self.query:
 
       # get when it is happening
-      if when["when"] == [dt.datetime.now().year, dt.datetime.now().month, dt.datetime.now().day]:
+      if today:
         p = "it is %s"
       else:
         p = "it will be %s"
 
       if "sun" in conditions:
         self.resp["text"] = p % "sunny"
-        self.resp["color"] = "blue"
+        self.resp["color"] = "yellow"
       else:
         self.resp["text"] = p % "not sunny"
       return 
@@ -91,7 +100,7 @@ def parse_weather(self, when, where, API_KEY):
     elif "cloud" in self.query:
 
       # get when it is happening
-      if when["when"] == [dt.datetime.now().year, dt.datetime.now().month, dt.datetime.now().day]:
+      if today:
         p = "it is %s"
       else:
         p = "it will be %s"
@@ -105,5 +114,9 @@ def parse_weather(self, when, where, API_KEY):
 
 
     elif "weather" in self.query:
-      t = (high+low)/2
-      self.resp["text"] = "%s degrees, and %s" % (t, conditions)
+      if today:
+        self.resp["text"] = "%s degrees, and %s" % (todayconditions["feelslike_f"], conditions)
+      else:
+        self.resp["text"] = "high of %s degrees, low of %s, and " % (high, low, conditions)
+
+
