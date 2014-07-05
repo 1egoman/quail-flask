@@ -1,3 +1,4 @@
+from flask import request
 from network import Packet
 import queryobject
 import os
@@ -30,6 +31,9 @@ class Plugin(object):
     """ gets the directory of the plugin. f should equal __file__ """
     d = f.split(os.sep)[-2]
     return os.path.abspath( os.path.join("plugins", d) )
+
+  def get_client_ip(self):
+   return request.remote_addr
 
 
 
