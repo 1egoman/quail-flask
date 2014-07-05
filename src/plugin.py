@@ -20,7 +20,7 @@ class Plugin(object):
     """
 
     # set query
-    self.query = queryobject.create_query_object( query )
+    self.query = queryobject.create_query_object( query, app=self.app)
 
     # set response
     self.resp = Packet()

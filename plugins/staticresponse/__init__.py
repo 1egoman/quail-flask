@@ -18,7 +18,7 @@ class StaticResponsePlugin(Plugin):
 
   def parse(self):
     # get phrase
-    querystr = ' '.join(self.query)
+    querystr = ' '.join([str(a) for a in self.query])
     phrase = [i for i in self.phrases if i in querystr]
     if len(phrase):
       longestphrase = sorted(phrase, key=lambda x: len(x))[-1]

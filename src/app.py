@@ -111,7 +111,7 @@ class App(object):
     self.flask.add_url_rule("/v2/<secret>/query/<query>/use/<plugin_name>/<int:n>", "query", view_func=self.do_query)
 
     # run flask
-    self.flask.run(host=self.config["host"], port=self.config["port"])
+    self.flask.run(host=self.config["host"], port=self.config["port"], debug=1)
 
   def get_root(self):
     return os.path.dirname( os.path.dirname( os.path.abspath(__file__) ) )

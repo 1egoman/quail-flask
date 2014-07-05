@@ -19,11 +19,27 @@ months = {
   12: "december"
 }
 
-
-def create_query_object(query):
-
+def create_query_object(query, app):
   # create response object
   response = query.split(' ')
+  response = format_time(response, query)
+  response = format_events(response, query, app)
+  return response
+
+
+def format_events(response, query, app):
+
+  # go through each word
+  for evt in app.calender.events:
+    if evt["name"] in query:
+      cp = evt.copy()
+      cp["type"] = "event"
+      response = replace_inside_string( query, response, evt["name"], cp )
+
+  return response
+
+
+def format_time(response, query):
 
   # times
   now = dt.datetime.now()
@@ -47,14 +63,14 @@ def create_query_object(query):
       days_delta = v - (now.weekday()+1) + 7 # our day of week we are trying to go to
       delta += dt.timedelta(days=days_delta)
       response = replace_inside_string(query, response, "next")
-      response = replace_inside_string(query, response, "tuesday", {"type": "time", "when": format_time(now + delta)})
+      response = replace_inside_string(query, response, "tuesday", {"type": "time", "when": (now + delta).strftime('%c')})
 
     # previous day (last tuesday)
     elif "last %s"%d in query:
       days_delta = v - (now.weekday()+1) - 7 # our day of week we are trying to go to
       delta += dt.timedelta(days=days_delta)
       response = replace_inside_string(query, response, "last")
-      response = replace_inside_string(query, response, "tuesday", {"type": "time", "when": format_time(now + delta)})
+      response = replace_inside_string(query, response, "tuesday", {"type": "time", "when": (now + delta).strftime('%c')})
 
     # day of week (ex. tuesday)
     elif d in query:
@@ -62,15 +78,15 @@ def create_query_object(query):
       days_delta = v - (now.weekday()+1) # our day of week we are trying to go to
       if days_delta < 0: days_delta += 7 # always look to the future
       delta += dt.timedelta(days=days_delta)
-      response = replace_inside_string(query, response, d, {"type": "time", "when": format_time(now + delta)})
+      response = replace_inside_string(query, response, d, {"type": "time", "when": (now + delta).strftime('%c')})
 
     elif "tommorow" in query:
       delta += dt.timedelta(days=1)
-      response = replace_inside_string(query, response, "tommorow", {"type": "time", "when": format_time(now + delta)})
+      response = replace_inside_string(query, response, "tommorow", {"type": "time", "when": (now + delta).strftime('%c')})
 
     elif "yesterday" in query:
       delta += dt.timedelta(days=-1)
-      response = replace_inside_string(query, response, "yesterday", {"type": "time", "when": format_time(now + delta)})
+      response = replace_inside_string(query, response, "yesterday", {"type": "time", "when": (now + delta).strftime('%c')})
 
 
 
@@ -107,10 +123,6 @@ def get_words(string, pos, words=1):
     if wordct >= words:
       return pos+c
 
-# turn time into list of [year, month, day, hour, minute, sec]
-def format_time(t):
-  out = t.strftime("%Y:%m:%d:%X").replace("/", ":")
-  return [int(d) for d in out.split(":")]
 
 # replace the specified word(s) with an object
 def replace_inside_string(query, resp, word, what=None):
@@ -125,6 +137,3 @@ def replace_inside_string(query, resp, word, what=None):
 
   # return
   return resp
-
-if __name__ == '__main__':
-  print create_query_object("tuesday the 2nd")

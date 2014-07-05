@@ -52,7 +52,8 @@ class WeatherPlugin(Plugin):
       # determine when
       when = [w for w in self.query if type(w) == dict and w.has_key("type") and w["type"] == "time"]
       if len(when):
-        when = when[0]
+        out = dt.datetime.strptime(when[0]["when"], '%c').strftime("%Y:%m:%d:%X").replace("/", ":")
+        when = [int(d) for d in out.split(":")]
       else:
         out = dt.datetime.now().strftime("%Y:%m:%d:%X").replace("/", ":")
         when = [int(d) for d in out.split(":")]
