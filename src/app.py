@@ -16,7 +16,7 @@ class App(object):
   """ This class is the main app class, which starts Quail """
   flask = Flask(__name__)
 
-  def __init__(self):
+  def __init__(self, **flask_args):
 
     cfgpath = os.path.join(self.get_root(), "config", "quail.json")
 
@@ -46,7 +46,7 @@ class App(object):
     thrd.daemon = True
     thrd.start()
 
-    self.run()
+    self.run(**flask_args)
 
 
   def do_query(self, secret, query="", plugin_name=None, n=0):
@@ -117,7 +117,7 @@ class App(object):
         response["text"] = filename
         return Response(dumps( response.format() ),  mimetype='application/json')
     
-  def run(self):
+  def run(self, **flask_args):
 
     # multiple rules for a query
     self.flask.add_url_rule("/v2/<secret>/query", "query", view_func=self.do_query)
@@ -130,11 +130,12 @@ class App(object):
     self.flask.add_url_rule("/v2/<secret>/upload", "upload", methods=["POST"], view_func=self.upload_resource)
 
     # run flask
-    self.flask.run(host=self.config["host"], port=self.config["port"], debug=1)
+    self.flask.run(host=self.config["host"], port=self.config["port"], **flask_args)
 
   def get_root(self):
     return os.path.dirname( os.path.dirname( os.path.abspath(__file__) ) )
 
   def add_api_hooks(self):
+    """ Add api hooks for plugins to access later on """
     self.calender = Calender(self)
     self.files = UserFiles(self)

@@ -2,9 +2,19 @@
 import sys
 
 def main():
+  flask_args = {}
+
+  # get args
+  if len(sys.argv) > 1:
+    if sys.argv[1] == "debug":
+      flask_args["debug"] = True
+
+  # append to path
   sys.path.append("src")
+
+  # run App
   import app
-  app.App()
+  app.App(**flask_args)
 
 if __name__ == '__main__':
   main()
