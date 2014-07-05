@@ -16,6 +16,9 @@ class App(object):
   """ This class is the main app class, which starts Quail """
   flask = Flask(__name__)
 
+  # quail version
+  VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH = 0, 1, 'A'
+
   def __init__(self, **flask_args):
 
     cfgpath = os.path.join(self.get_root(), "config", "quail.json")
