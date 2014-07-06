@@ -24,6 +24,7 @@ def create_query_object(query, app):
   response = query.split(' ')
   response = format_time(response, query)
   response = format_events(response, query, app)
+  response = format_people(response, query, app)
   return response
 
 
@@ -38,6 +39,29 @@ def format_events(response, query, app):
 
   return response
 
+def format_people(response, query, app):
+  # Does the query have at least 2 relevent bits of information pertaining to a person? If so, return the person's info
+  people = app.people.data
+  SUFFIXES = ["", "'s", "ies"]
+
+  for p in people:
+    keyin = 0
+    for k, v in p.items():
+      papp = p.copy()
+      papp["type"] = "person"
+
+      # if the values are in the query
+      if type(v) == list:
+        for w in v:
+          for s in SUFFIXES:
+            if "%s%s" % (w, s) in response: 
+              response = replace_inside_string( query, response, "%s%s" % (w, s), papp )
+      else:
+        if v in response or "%s's" % v in response:
+          response = replace_inside_string( query, response, v, papp )
+          response = replace_inside_string( query, response, "%s's" % v, papp )
+
+  return response
 
 def format_time(response, query):
 
