@@ -6,7 +6,7 @@ def main():
 
   # get args
   if len(sys.argv) > 1:
-    if sys.argv[1] == "debug":
+    if sys.argv[1] == "debug" or sys.argv[1] == "develop" or sys.argv[1] == "devel":
       flask_args["debug"] = True
 
   # append to path
