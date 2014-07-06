@@ -7,6 +7,7 @@ from network import Packet, STATUS_OK, STATUS_NO_HIT, STATUS_ERR
 from plugins import PluginManager
 from calender import Calender
 from files import UserFiles
+from people import PeopleContainer
 import wolfram
 import listener
 
@@ -15,9 +16,10 @@ DEFAULTCONFIG = """"""
 class App(object):
   """ This class is the main app class, which starts Quail """
   flask = Flask(__name__)
+  """ Contains the main flask instance """
 
   # quail version
-  VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH = 0, 1, 'A'
+  VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH = 1, 1, 'A'
 
   def __init__(self, **flask_args):
 
@@ -121,6 +123,7 @@ class App(object):
         return Response(dumps( response.format() ),  mimetype='application/json')
     
   def run(self, **flask_args):
+    """ Sets all the flask options behind the scenes, and starte Flask """
 
     # multiple rules for a query
     self.flask.add_url_rule("/v2/<secret>/query", "query", view_func=self.do_query)
@@ -136,9 +139,11 @@ class App(object):
     self.flask.run(host=self.config["host"], port=self.config["port"], **flask_args)
 
   def get_root(self):
+    """ Get root Quail directory """
     return os.path.dirname( os.path.dirname( os.path.abspath(__file__) ) )
 
   def add_api_hooks(self):
-    """ Add api hooks for plugins to access later on """
+    """ Add api hooks for plugins to access later on, like people, events, etc """
     self.calender = Calender(self)
     self.files = UserFiles(self)
+    self.people = PeopleContainer(self)
