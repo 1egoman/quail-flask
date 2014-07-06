@@ -1,0 +1,7 @@
+{
+  "name": "Time and Date",
+  "desc": "Outputs time and date",
+  "author": "Ryan Gaus",
+  "twitter": "@rgausnet",
+  "plugin": "DateTimePlugin"
+}
