@@ -1,4 +1,4 @@
-![quail logo](https://cdn.rawgit.com/1egoman/quail/83cab06d22c9e30a714e58a978d65d8e4f9d7b45/logo.svg)
+![quail logo](http://rgaus.net/quail/images/quail.svg)
 
 Look at [http://rgaus.net/quail](http://rgaus.net/quail) for more information
 
