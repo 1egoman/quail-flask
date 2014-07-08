@@ -19,7 +19,7 @@ class App(object):
   """ Contains the main flask instance """
 
   # quail version
-  VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH = 1, 3, 'A'
+  VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH = 1, 3, 'C'
 
   def __init__(self, **flask_args):
 
@@ -122,7 +122,7 @@ class App(object):
     if plugin["instance"].validate():
 
       # add to history, if human-made
-      if self.user_type == "human":
+      if "human" in self.user_type:
         self.lastplugin = plugin
 
       # parse the query
