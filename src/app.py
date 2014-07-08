@@ -60,6 +60,10 @@ class App(object):
   def do_query(self, secret, query="", plugin_name=None, n=0):
     """ Perform a query. Can be called by flask or another process """
 
+    # get information about the user
+    n = n or request.args.get("n") or 0
+    self.user_type = request.args.get("type") or "human"
+
     # are we autorized?
     if secret == self.config["secret"]:
       response = None
@@ -117,8 +121,11 @@ class App(object):
     plugin["instance"].new_query(query)
     if plugin["instance"].validate():
 
-      # found the right plugin, parse the query
-      self.lastplugin = plugin
+      # add to history, if human-made
+      if self.user_type == "human":
+        self.lastplugin = plugin
+
+      # parse the query
       plugin["instance"].parse()
       return plugin["instance"].resp
     return None
