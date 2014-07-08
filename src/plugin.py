@@ -46,6 +46,9 @@ class Plugin(object):
     """ Returns the client's IP address """
     return request.remote_addr
 
+  def did_previous_query(self):
+    """ Did this plugin do the previous query? """
+    return bool( self.app.lastplugin and self.app.lastplugin["instance"] == self )
 
 
   def validate(self): return False

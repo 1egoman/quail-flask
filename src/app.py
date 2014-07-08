@@ -19,7 +19,7 @@ class App(object):
   """ Contains the main flask instance """
 
   # quail version
-  VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH = 1, 2, 'A'
+  VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH = 1, 3, 'A'
 
   def __init__(self, **flask_args):
 
@@ -37,6 +37,9 @@ class App(object):
 
     # add all api hooks
     self.add_api_hooks()
+
+    # last plugin
+    self.lastplugin = None
 
     # create plugin manager
     self.manager = PluginManager(self)
@@ -63,17 +66,16 @@ class App(object):
 
       if len(query):
 
+        # check the last used plugin first
+        if self.lastplugin: 
+          response = self.run_plugin(self.lastplugin, query)
+
         # locate correct plugin
-        for plugin in self.manager.plugins:
-
-          # set new query, and validate
-          plugin["instance"].new_query(query)
-          if plugin["instance"].validate():
-
-            # found the right plugin!
-            # parse the query
-            plugin["instance"].parse()
-            response = plugin["instance"].resp
+        if not response:
+          for plugin in self.manager.plugins:
+            response = self.run_plugin(plugin, query)
+            if response: 
+              break
 
         # if there is no response, try and parse something from wolfram alpha
         if not response: response = wolfram.parse(query, self.config["wa-api-key"])
@@ -108,6 +110,18 @@ class App(object):
     
     # return the response
     return Response(dumps(out),  mimetype='application/json')
+
+  def run_plugin(self, plugin, query):
+    """ Run a plugin if it can accept the query """
+    # set new query, and validate
+    plugin["instance"].new_query(query)
+    if plugin["instance"].validate():
+
+      # found the right plugin, parse the query
+      self.lastplugin = plugin
+      plugin["instance"].parse()
+      return plugin["instance"].resp
+    return None
 
   def upload_resource(self, secret): 
     """ Upload a resource to quail so it can be parsed/used in a query """
