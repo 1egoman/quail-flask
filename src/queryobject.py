@@ -22,6 +22,7 @@ months = {
 def create_query_object(query, app):
   # create response object
   response = query.split(' ')
+  response = format_day(response, query)
   response = format_time(response, query)
   response = format_events(response, query, app)
   response = format_people(response, query, app)
@@ -65,9 +66,24 @@ def format_people(response, query, app):
 
 def format_time(response, query):
 
+  for ct,r in enumerate(response):
+    if type(r) == str or type(r) == unicode:
+      timeone = re.findall("([01]?[0-9]):([0-5][0-9]) ?(am|AM|pm|PM)", r)
+      if len(timeone):
+        now = dt.datetime.now()
+        when = dt.datetime(year=now.year, month=now.month, day=now.day, hour=12+int(timeone[0][0]), minute=int(timeone[0][1]) )
+        response = replace_inside_string(query, response, r, {"type": "time", "when": when.strftime("%c") })  
+
+  return response
+
+
+def format_day(response, query):
+
   # times
   now = dt.datetime.now()
+  now = dt.datetime(year=now.year, month=now.month, day=now.day, hour=0, minute=0, second=0)
   delta = dt.timedelta()
+  querytimedelta = dt.timedelta()
 
   day_dict = {
     "monday": 1,
@@ -79,6 +95,21 @@ def format_time(response, query):
     "sunday": 0
   }
 
+  # check for times, merge any times with the dates
+  for r in response:
+    
+    for i in [-2, -1, 0, 1, 2]:
+      try:
+        g = response[i]
+        if type(g) == str or type(g) == unicode:
+          times = re.findall("([01]?[0-9]):([0-5][0-9]) ?(am|AM|pm|PM)", g)
+          if len(times):
+            querytimedelta = dt.timedelta(hours=12+int(times[0][0]), minutes=int(times[0][1]))
+            response.remove(g)
+            break
+      except IndexError: pass
+
+
   # iterate through days
   for d,v in day_dict.items():
 
@@ -87,14 +118,14 @@ def format_time(response, query):
       days_delta = v - (now.weekday()+1) + 7 # our day of week we are trying to go to
       delta += dt.timedelta(days=days_delta)
       response = replace_inside_string(query, response, "next")
-      response = replace_inside_string(query, response, "tuesday", {"type": "time", "when": (now + delta).strftime('%c')})
+      response = replace_inside_string(query, response, "tuesday", {"type": "time", "when": (now + delta + querytimedelta).strftime('%c')})
 
     # previous day (last tuesday)
     elif "last %s"%d in query:
       days_delta = v - (now.weekday()+1) - 7 # our day of week we are trying to go to
       delta += dt.timedelta(days=days_delta)
       response = replace_inside_string(query, response, "last")
-      response = replace_inside_string(query, response, "tuesday", {"type": "time", "when": (now + delta).strftime('%c')})
+      response = replace_inside_string(query, response, "tuesday", {"type": "time", "when": (now + delta + querytimedelta).strftime('%c')})
 
     # day of week (ex. tuesday)
     elif d in query:
@@ -102,15 +133,15 @@ def format_time(response, query):
       days_delta = v - (now.weekday()+1) # our day of week we are trying to go to
       if days_delta < 0: days_delta += 7 # always look to the future
       delta += dt.timedelta(days=days_delta)
-      response = replace_inside_string(query, response, d, {"type": "time", "when": (now + delta).strftime('%c')})
+      response = replace_inside_string(query, response, d, {"type": "time", "when": (now + delta + querytimedelta).strftime('%c')})
 
     elif "tommorow" in query:
       delta += dt.timedelta(days=1)
-      response = replace_inside_string(query, response, "tommorow", {"type": "time", "when": (now + delta).strftime('%c')})
+      response = replace_inside_string(query, response, "tommorow", {"type": "time", "when": (now + delta + querytimedelta).strftime('%c')})
 
     elif "yesterday" in query:
       delta += dt.timedelta(days=-1)
-      response = replace_inside_string(query, response, "yesterday", {"type": "time", "when": (now + delta).strftime('%c')})
+      response = replace_inside_string(query, response, "yesterday", {"type": "time", "when": (now + delta + querytimedelta).strftime('%c')})
 
 
 
@@ -130,7 +161,7 @@ def format_time(response, query):
 
     # set it
     now = dt.datetime(day=days_delta, month=now.month, year=now.year)
-    response = replace_inside_string(query, response, "%s%s" % (specific_day.group(1), specific_day.group(2)), {"type": "time", "when": format_time(now + delta)})       
+    response = replace_inside_string(query, response, "%s%s" % (specific_day.group(1), specific_day.group(2)), {"type": "time", "when": format_time(now + delta + querytimedelta)})       
 
   return response
 
