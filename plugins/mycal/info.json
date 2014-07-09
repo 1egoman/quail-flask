@@ -2,5 +2,5 @@
   "name": "Calender Event Adder",
   "desc": "add events to calender",
   "author": "Ryan Gaus",
-  "plugin": "aPlugin"
+  "plugin": "CalPlugin"
 }

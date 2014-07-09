@@ -7,8 +7,6 @@ CAL_DEL_WORDS = ["named", "called", "check", "delete", "remove"]
 STRIP_WORDS = ["to", "from", "on", "in", "by", "list"]
 WHEN_WORDS = ["at", "for"]
 
-class aPlugin(Plugin): pass
-
 class CalPlugin(Plugin):
 
   def validate(self):
