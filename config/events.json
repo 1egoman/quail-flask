@@ -1,7 +1,70 @@
 [
   {
+    "when": "Tue Jul  1 12:00:00 2014", 
     "where": null, 
-    "when": "Wed Jul  9 17:55:00 2014", 
-    "name": "bladybla"
+    "name": "Walking", 
+    "tags": [
+      "walk", 
+      "exercise"
+    ]
+  }, 
+  {
+    "when": "Wed Jul  2 12:00:00 2014", 
+    "where": null, 
+    "name": "Walking", 
+    "tags": [
+      "walk", 
+      "exercise"
+    ]
+  }, 
+  {
+    "when": "Thu Jul  3 12:00:00 2014", 
+    "where": null, 
+    "name": "Strength", 
+    "tags": [
+      "strength", 
+      "exercise"
+    ]
+  }, 
+  {
+    "when": "Fri Jul  4 12:00:00 2014", 
+    "where": null, 
+    "name": "Walking", 
+    "tags": [
+      "walk", 
+      "exercise"
+    ]
+  }, 
+  {
+    "when": "Sat Jul  5 12:00:00 2014", 
+    "where": null, 
+    "name": "Strength", 
+    "tags": [
+      "strength", 
+      "exercise"
+    ]
+  }, 
+  {
+    "when": "Mon Jul  7 12:00:00 2014", 
+    "where": null, 
+    "name": "Walking", 
+    "tags": [
+      "walk", 
+      "exercise"
+    ]
+  }, 
+  {
+    "where": null, 
+    "when": "Wed Jul  9 12:39:25 2014", 
+    "name": "Walking", 
+    "tags": [
+      "walk", 
+      "exercise"
+    ]
+  },
+  {
+    "where": null, 
+    "when": "Wed Jul  9 17:30:00 2014", 
+    "name": "chronicleme_hangout"
   }
 ]

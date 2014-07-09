@@ -103,7 +103,10 @@ def format_day(response, query):
         if type(g) == str or type(g) == unicode:
           times = re.findall("([01]?[0-9]):([0-5][0-9]) ?(am|AM|pm|PM)", g)
           if len(times):
-            querytimedelta = dt.timedelta(hours=12+int(times[0][0]), minutes=int(times[0][1]))
+            if 'p' in times[0][2].lower():
+              querytimedelta = dt.timedelta(hours=12+int(times[0][0]), minutes=int(times[0][1]))
+            else:
+              querytimedelta = dt.timedelta(hours=int(times[0][0]), minutes=int(times[0][1]))
             response.remove(g)
             timect = c
             break
@@ -171,7 +174,10 @@ def format_day(response, query):
 
 
   # otherwise...
-  response[timect-1] = {"type": "time", "when": (now + querytimedelta).strftime('%c'), "text": (now + querytimedelta).strftime('%I:%M %p')}
+  if querytimedelta:
+    try:
+      response[timect-1] = {"type": "time", "when": (now + querytimedelta).strftime('%c'), "text": (now + querytimedelta).strftime('%I:%M %p')}
+    except IndexError: pass
 
   return response
 
