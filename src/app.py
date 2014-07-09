@@ -1,4 +1,4 @@
-from flask import Flask, Response, url_for, jsonify, redirect, request
+from flask import *#Flask, Response, url_for, jsonify, redirect, request, redner_template
 from werkzeug.utils import secure_filename
 from json import dumps, loads
 import os
@@ -19,7 +19,7 @@ class App(object):
   """ Contains the main flask instance """
 
   # quail version
-  VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH = 1, 4, 'A'
+  VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH = 1, 5, 'A'
 
   def __init__(self, **flask_args):
 
@@ -142,6 +142,23 @@ class App(object):
         response["status"] = STATUS_OK
         response["text"] = filename
         return Response(dumps( response.format() ),  mimetype='application/json')
+
+  def web_gui(self, secret, plugin=None, path="/"):
+    """ Web interface for quail interaction """
+    html = ""
+    root = ""
+
+    # quail's site
+    if not plugin:
+
+      if request.args.has_key("query"):
+        text = request.args.get("query")
+        q = loads(self.do_query(self.config["secret"], query=text, n=1).data)
+        html = render_template(  os.path.join(root, "query.html"), query=q  )
+      elif path == "/":
+        html = render_template( os.path.join(root, "layout.html") )
+
+    return html
     
   def run(self, **flask_args):
     """ Sets all the flask options behind the scenes, and starte Flask """
@@ -155,6 +172,12 @@ class App(object):
 
     # uploading of files
     self.flask.add_url_rule("/v2/<secret>/upload", "upload", methods=["POST"], view_func=self.upload_resource)
+
+    # web interface
+    self.flask.add_url_rule("/v2/<secret>/web", "web", view_func=self.web_gui)
+    self.flask.add_url_rule("/v2/<secret>/web/<path>", "web", view_func=self.web_gui)
+    self.flask.add_url_rule("/v2/<secret>/<plugin>/web", "web", view_func=self.web_gui)
+    self.flask.add_url_rule("/v2/<secret>/<plugin>/web/<path>", "web", view_func=self.web_gui)
 
     # run flask
     self.flask.run(host=self.config["host"], port=self.config["port"], **flask_args)
