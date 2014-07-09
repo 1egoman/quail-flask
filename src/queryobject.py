@@ -171,7 +171,7 @@ def format_day(response, query):
 
 
   # otherwise...
-  response[timect-1] = {"type": "time", "when": (now + querytimedelta).strftime('%c')}
+  response[timect-1] = {"type": "time", "when": (now + querytimedelta).strftime('%c'), "text": (now + querytimedelta).strftime('%I:%M %p')}
 
   return response
 
