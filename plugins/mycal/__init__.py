@@ -1,5 +1,5 @@
 from plugin import Plugin
-from network import STATUS_OK
+from network import STATUS_OK, Packet
 import datetime as dt
 
 CAL_ADD_WORDS = ["named", "called", "create", "add"]
@@ -7,10 +7,29 @@ CAL_DEL_WORDS = ["named", "called", "check", "delete", "remove"]
 STRIP_WORDS = ["to", "from", "on", "in", "by", "list"]
 WHEN_WORDS = ["at", "for"]
 
+notified = []
+
 class CalPlugin(Plugin):
 
   def validate(self):
     return "calender" in self.query or "event" in self.query.as_str()
+
+  def listener(self):
+    now = dt.datetime.now()
+
+    # any events coming up?
+    for event in self.app.calender.events:
+      when = dt.datetime.strptime(event["when"], '%c')
+
+      if when.hour == now.hour and when.minute == now.minute and event["name"] not in notified:
+        # notify
+        notified.append(event["name"])
+        # print when, "NOTIFY!!!!"
+
+        pkt = Packet()
+        pkt["status"] = STATUS_OK
+        pkt["text"] = "Calender: %s" % event["name"]
+        self.app.stack.append(pkt)
 
   def parse(self):
 
@@ -32,7 +51,12 @@ class CalPlugin(Plugin):
           start = ct+1
 
         elif start != None and r in STRIP_WORDS:
-          name = ' '.join(self.query[start:ct])
+          try:
+            name = ' '.join(self.query[start:ct])
+          except TypeError:
+            self.resp["text"] = "Event already exists!"
+            self.resp["status"] = STATUS_OK
+            return
           break
 
       # add it
