@@ -31,11 +31,10 @@ days_dict = {
 
 def create_query_object(query, app):
   # create response object
-  response = query.split(' ')
+  response = query.replace('+', ' ').split(' ')
   response = format_time(response, query)
   response = format_events(response, query, app)
   response = format_people(response, query, app)
-  print response
   return response
 
 
@@ -76,7 +75,32 @@ def format_people(response, query, app):
 
 def format_time(resp, query):
 
+  # 6 o'clock -> 6:00pm (voice recognition)
+  # 10 o'clock am -> 10:00am
+  oclock = re.compile("([0-2]?[0-9]) o.?'?clock.? ?(pm|PM|Pm|p\.m\.|am|AM|Am|a\.m\.)?")
+  for match in oclock.finditer(query):
+    # get all words following time
+    wordsupto = query[:match.start()]
 
+    # get where to start replacement, and how many words to replace
+    startreplaceat = len(wordsupto.strip())
+    endreplaceat = startreplaceat + len(match.group())
+
+    # replace
+    try:
+      if match.group(2):
+        if 'a' in match.group(2).lower():
+          query = query[:startreplaceat-1] + "%s:00am" % match.group(1) + query[endreplaceat+1:]
+        else:
+          query = query[:startreplaceat-1] + "%s:00pm" % match.group(1) + query[endreplaceat+1:]
+      else:
+        query[startreplaceat] = "%s:00%s" % ( match.group(1), dt.datetime.now().strftime("%p") )
+    except IndexError:
+      query[startreplaceat] = "%s:00%s" % ( match.group(1), dt.datetime.now().strftime("%p") )
+
+
+
+  # do the real detection
   c_times = re.compile("([0-2]?[0-9]):([0-6]?[0-9]) ?(pm|PM|Pm|p\.m\.|am|AM|Am|a\.m\.)")
   c_days = re.compile("(Monday|monday|Mon|mon|Tuesday|tuesday|tue|Tue|Wednesday|wednesday|Wed|wed|Thursday|thursday|thurs|Thurs|Friday|friday|Fri|fri|Saturday|saturday|sat|Sat|Sunday|sunday|sun|Sun)")
   c_days_and_times = re.compile("(Mon|mon|Monday|monday|Tue|Tuesday|tuesday|tue|Wed|wed|Wednesday|wednesday|thurs|Thurs|Thursday|thursday|Fri|fri|Friday|friday|sat|Sat|Saturday|saturday|sun|Sun|Sunday|sunday) .* ?([0-2]?[0-9]):([0-6]?[0-9]) ?(pm|PM|Pm|p\.m\.|am|AM|Am|a\.m\.)")
@@ -96,7 +120,7 @@ def format_time(resp, query):
       endreplaceat = startreplaceat + len(match.group().split(' '))
 
       # convert the user's time to a datetime object
-      timestr = "%s:%s %s" % (  match.group(2), match.group(3), match.group(4).upper()  )
+      timestr = "%s:%s %s" % (  match.group(2), match.group(3), match.group(4).upper().replace('.', '')  )
       dtobj = dt.datetime.strptime(timestr, "%I:%M %p")
 
       # same as above but for the days
