@@ -51,13 +51,13 @@ class CalPlugin(Plugin):
           start = ct+1
 
         elif start != None and r in STRIP_WORDS:
-          try:
-            name = ' '.join(self.query[start:ct])
-          except TypeError:
-            self.resp["text"] = "Event already exists!"
-            self.resp["status"] = STATUS_OK
-            return
-          break
+            if len([1 for d in self.query[start:ct] if type(d) == dict and d["type"] == "event"]):
+              self.resp["text"] = "Event already exists!"
+              self.resp["status"] = STATUS_OK
+              return
+            else:
+              name = ' '.join(   self.query.as_str().split(' ')[start:ct]   )
+              break
 
       # add it
       self.app.calender.add_event(name=name, when=time)

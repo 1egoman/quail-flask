@@ -19,13 +19,23 @@ months = {
   12: "december"
 }
 
+days_dict = {
+  "monday": 0,
+  "tuesday": 1,
+  "wednesday": 2,
+  "thursday": 3,
+  "friday": 4,
+  "saturday": 5,
+  "sunday": 6
+}
+
 def create_query_object(query, app):
   # create response object
   response = query.split(' ')
-  response = format_day(response, query)
   response = format_time(response, query)
   response = format_events(response, query, app)
   response = format_people(response, query, app)
+  print response
   return response
 
 
@@ -64,122 +74,112 @@ def format_people(response, query, app):
 
   return response
 
-def format_time(response, query):
-
-  # for ct,r in enumerate(response):
-  #   if type(r) == str or type(r) == unicode:
-  #     timeone = re.findall("([01]?[0-9]):([0-5][0-9]) ?(am|AM|pm|PM)", r)
-  #     if len(timeone):
-  #       now = dt.datetime.now()
-  #       when = dt.datetime(year=now.year, month=now.month, day=now.day, hour=12+int(timeone[0][0]), minute=int(timeone[0][1]) )
-  #       response = replace_inside_string(query, response, r, {"type": "time", "when": when.strftime("%c") })  
-
-  return response
+def format_time(resp, query):
 
 
-def format_day(response, query):
+  c_times = re.compile("([0-2]?[0-9]):([0-6]?[0-9]) ?(pm|PM|Pm|p\.m\.|am|AM|Am|a\.m\.)")
+  c_days = re.compile("(Monday|monday|Mon|mon|Tuesday|tuesday|tue|Tue|Wednesday|wednesday|Wed|wed|Thursday|thursday|thurs|Thurs|Friday|friday|Fri|fri|Saturday|saturday|sat|Sat|Sunday|sunday|sun|Sun)")
+  c_days_and_times = re.compile("(Mon|mon|Monday|monday|Tue|Tuesday|tuesday|tue|Wed|wed|Wednesday|wednesday|thurs|Thurs|Thursday|thursday|Fri|fri|Friday|friday|sat|Sat|Saturday|saturday|sun|Sun|Sunday|sunday) .* ?([0-2]?[0-9]):([0-6]?[0-9]) ?(pm|PM|Pm|p\.m\.|am|AM|Am|a\.m\.)")
+  
+  # if both matched...
+  if len(tuple(c_days_and_times.finditer(query))):
 
-  # times
-  now = dt.datetime.now()
-  now = dt.datetime(year=now.year, month=now.month, day=now.day, hour=0, minute=0, second=0)
-  delta = dt.timedelta()
-  querytimedelta = dt.timedelta()
-  timect = -1
+  # get any dates and times in phrase
+  # EX: Tuesday at 5:30 pm
+    for match in c_days_and_times.finditer(query):
 
-  day_dict = {
-    "monday": 1,
-    "tuesday": 2,
-    "wednesday": 3,
-    "thursday": 4,
-    "friday": 5,
-    "saturday": 6,
-    "sunday": 0
-  }
+      # get all words following time
+      wordsupto = query[:match.start()]
 
-  # check for times, merge any times with the dates
-  for c, g in enumerate(response):
-    
-      try:
-        if type(g) == str or type(g) == unicode:
-          times = re.findall("([01]?[0-9]):([0-5][0-9]) ?(am|AM|pm|PM)", g)
-          if len(times):
-            if 'p' in times[0][2].lower():
-              querytimedelta = dt.timedelta(hours=12+int(times[0][0]), minutes=int(times[0][1]))
-            else:
-              querytimedelta = dt.timedelta(hours=int(times[0][0]), minutes=int(times[0][1]))
-            response.remove(g)
-            timect = c
-            break
-      except IndexError: pass
+      # get where to start replacement, and how many words to replace
+      startreplaceat = len(wordsupto.strip().split(' '))
+      endreplaceat = startreplaceat + len(match.group().split(' '))
 
+      # convert the user's time to a datetime object
+      timestr = "%s:%s %s" % (  match.group(2), match.group(3), match.group(4).upper()  )
+      dtobj = dt.datetime.strptime(timestr, "%I:%M %p")
 
-  # iterate through days
-  for d,v in day_dict.items():
+      # same as above but for the days
+      today = dt.datetime.today()
+      days = [v for k,v in days_dict.items() if match.group(1).lower() in k]
+      if len(days):
+        # calculate days until the requested day
+        days_until = (days[0] - today.weekday() + 7) % 7
+      else:
+        days_until = 0 # ??? why would this ever land here?
 
-    # next day (next tuesday)
-    if "next %s"%d in query:
-      days_delta = v - (now.weekday()+1) + 7 # our day of week we are trying to go to
-      delta += dt.timedelta(days=days_delta)
-      response = replace_inside_string(query, response, "next")
-      response = replace_inside_string(query, response, "tuesday", {"type": "time", "when": (now + delta + querytimedelta).strftime('%c')})
-      return response
+      # create the datetime object
+      time = dt.datetime.combine(   dt.datetime.now() + dt.timedelta(days=days_until), dt.time(dtobj.hour, dtobj.minute, dtobj.second)   )
 
-    # previous day (last tuesday)
-    elif "last %s"%d in query:
-      days_delta = v - (now.weekday()+1) - 7 # our day of week we are trying to go to
-      delta += dt.timedelta(days=days_delta)
-      response = replace_inside_string(query, response, "last")
-      response = replace_inside_string(query, response, "tuesday", {"type": "time", "when": (now + delta + querytimedelta).strftime('%c')})
-      return response
+      # create the data structure
+      data = {"type": "time", "when": time.strftime('%c'), "text": match.group(0)}
 
-    # day of week (ex. tuesday)
-    elif d in query:
-
-      days_delta = v - (now.weekday()+1) # our day of week we are trying to go to
-      if days_delta < 0: days_delta += 7 # always look to the future
-      delta += dt.timedelta(days=days_delta)
-      response = replace_inside_string(query, response, d, {"type": "time", "when": (now + delta + querytimedelta).strftime('%c')})
-      return response
-
-    elif "tommorow" in query:
-      delta += dt.timedelta(days=1)
-      response = replace_inside_string(query, response, "tommorow", {"type": "time", "when": (now + delta + querytimedelta).strftime('%c')})
-      return response
-
-    elif "yesterday" in query:
-      delta += dt.timedelta(days=-1)
-      response = replace_inside_string(query, response, "yesterday", {"type": "time", "when": (now + delta + querytimedelta).strftime('%c')})
-      return response
+      # do the replacing
+      resp[startreplaceat] = data
+      resp[startreplaceat+1:endreplaceat] = ''
 
 
+  # if just the time matched...
+  elif len(tuple(c_times.finditer(query))):
+
+    # get any times in phrase
+    # EX: 5:30 pm
+    for match in c_times.finditer(query):
+
+      # get all words following time
+      wordsupto = query[:match.start()]
+
+      # get where to start replacement, and how many words to replace
+      startreplaceat = len(wordsupto.strip().split(' '))
+      endreplaceat = startreplaceat + len(match.group().split(' '))
+
+      # convert the user's time to a datetime object
+      timestr = "%s:%s %s" % (  match.group(1), match.group(2), match.group(3).upper()  )
+      dtobj = dt.datetime.strptime(timestr, "%I:%M %p")
+      time = dt.datetime.combine(   dt.datetime.now(), dt.time(dtobj.hour, dtobj.minute, dtobj.second)   )
+
+      # create the data structure
+      data = {"type": "time", "when": time.strftime('%c'), "text": match.group(0)}
+
+      # do the replacing
+      resp[startreplaceat] = data
+      resp[startreplaceat+1:endreplaceat] = ''
 
 
-  # day and the exact day (21st, or 2nd)
-  specific_day = re.search(  "([0-9]?[0-9])(st|nd|rd|th)", query  )
-  if specific_day and specific_day.group(1).isdigit():
+  # if just the days matched...
+  elif len(tuple(c_days.finditer(query))):
 
-    # find out days
-    days_delta = int(specific_day.group(1))
-    
-    # always move foreward to the next month
-    if days_delta <= now.day:
-      month_delta = 1
-    else:
-      month_delta = 0
+    # get any day only in phrase
+    # EX: Tuesday
+    for match in c_days.finditer(query):
 
-    # set it
-    now = dt.datetime(day=days_delta, month=now.month, year=now.year)
-    response = replace_inside_string(query, response, "%s%s" % (specific_day.group(1), specific_day.group(2)), {"type": "time", "when": format_time(now + delta + querytimedelta)})  
-    return response    
+      # get all words following time
+      wordsupto = query[:match.start()]
 
+      # get where to start replacement, and how many words to replace
+      startreplaceat = len(wordsupto.strip().split(' '))
+      endreplaceat = startreplaceat + len(match.group().split(' '))
 
-  # otherwise...
-  if querytimedelta:
-    try:
-      response[timect-1] = {"type": "time", "when": (now + querytimedelta).strftime('%c'), "text": (now + querytimedelta).strftime('%I:%M %p')}
-    except IndexError: pass
+      # convert the user's time to a datetime object
+      today = dt.datetime.today()
+      days = [v for k,v in days_dict.items() if match.group(1).lower() in k]
+      if len(days):
+        # calculate days until the requested day
+        days_until = (days[0] - today.weekday() + 7) % 7
+      else:
+        days_until = 0 # ??? why would this ever land here?
 
-  return response
+      # calculate datetime object
+      time = dt.datetime.now() + dt.timedelta(days=days_until)
+
+      # create the data structure
+      data = {"type": "time", "when": time.strftime('%c'), "text": match.group(0)}
+
+      # do the replacing
+      resp[startreplaceat] = data
+      resp[startreplaceat+1:endreplaceat] = ''
+
+  return resp
 
 
 
