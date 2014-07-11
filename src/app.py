@@ -19,7 +19,7 @@ class App(object):
   """ Contains the main flask instance """
 
   # quail version
-  VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH = 1, 5, 'B'
+  VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH = 1, 6, 'A'
 
   def __init__(self, **flask_args):
 
@@ -155,8 +155,14 @@ class App(object):
         text = request.args.get("query")
         q = loads(self.do_query(self.config["secret"], query=text, n=1).data)
         html = render_template(  os.path.join(root, "query.html"), query=q  )
+
       elif path == "/":
-        html = render_template( os.path.join(root, "layout.html") )
+        t = ""
+        for plugin in self.manager.plugins:
+          html = plugin["instance"].html_provider()
+          if html:
+            t += "<div class=\"plugin\"><div class=\"title\">%s</div><div class=\"data\">%s</div></div>" % (plugin["instance"].__class__.__name__, html)
+        html = render_template( os.path.join(root, "index.html"), body=t)
 
     return html
     

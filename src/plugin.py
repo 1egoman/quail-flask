@@ -50,6 +50,9 @@ class Plugin(object):
     """ Did this plugin do the previous query? """
     return bool( self.app.lastplugin and self.app.lastplugin["instance"] == self )
 
+  def html_provider(self):
+    return ""
+
 
   def validate(self): return False
   def parse(self): pass
