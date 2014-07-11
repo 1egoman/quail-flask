@@ -12,7 +12,7 @@ notified = []
 class CalPlugin(Plugin):
 
   def validate(self):
-    return "calender" in self.query or "event" in self.query.as_str()
+    return "calender" in self.query or "calendar" in self.query or "event" in self.query.as_str()
 
   def listener(self):
     now = dt.datetime.now()
@@ -21,7 +21,8 @@ class CalPlugin(Plugin):
     for event in self.app.calender.events:
       when = dt.datetime.strptime(event["when"], '%c')
 
-      if when.hour == now.hour and when.minute == now.minute and event["name"] not in notified:
+      donotify = (event.has_key("tags") and "nonotify" not in event["tags"]) or (not event.has_key("tags"))
+      if when.hour == now.hour and when.minute == now.minute and donotify and event["name"] not in notified:
         # notify
         notified.append(event["name"])
         # print when, "NOTIFY!!!!"
@@ -90,3 +91,11 @@ class CalPlugin(Plugin):
           self.resp["text"] = "Cannot find event named %s" % name["name"]
           self.resp["status"] = STATUS_OK
           return
+
+
+
+  def html_provider(self, maxevents=8):
+    d = "Today:<ul>"
+    for e in self.app.calender.events.day(dt.datetime.now().day)[:maxevents]:
+      d += "<li style='list-style-type: none;'><span style=\"font-weight: bold;'\">%s</span> on %s " % ( e["name"], dt.datetime.strptime(e["when"], '%c').strftime("%A, %B %d at %I:%M %p") )
+    return d
