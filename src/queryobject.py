@@ -81,6 +81,8 @@ def format_time(resp, query):
   c_times = re.compile("([0-2]?[0-9]):([0-6]?[0-9]) ?(pm|PM|Pm|p\.m\.|am|AM|Am|a\.m\.)?")
   c_times_oclock = re.compile("([0-2]?[0-9]) ?o'?.?clock.? ?(pm|PM|Pm|p\.m\.|am|AM|Am|a\.m\.)?")
   c_days = re.compile("(Monday|monday|Mon|mon|Tuesday|tuesday|tue|Tue|Wednesday|wednesday|Wed|wed|Thursday|thursday|thurs|Thurs|Friday|friday|Fri|fri|Saturday|saturday|sat|Sat|Sunday|sunday|sun|Sun)")
+  c_days_tommorow = re.compile("tommorow")
+  c_days_yesterday = re.compile("yesterday")
   c_days_and_times = re.compile("(Mon|mon|Monday|monday|Tue|Tuesday|tuesday|tue|Wed|wed|Wednesday|wednesday|thurs|Thurs|Thursday|thursday|Fri|fri|Friday|friday|sat|Sat|Saturday|saturday|sun|Sun|Sunday|sunday) .* ?([0-2]?[0-9]):([0-6]?[0-9]) ?(pm|PM|Pm|p\.m\.|am|AM|Am|a\.m\.)")
   
   # if both matched...
@@ -213,6 +215,56 @@ def format_time(resp, query):
       # do the replacing
       resp[startreplaceat] = data
       resp[startreplaceat+1:endreplaceat] = ''
+
+
+  # tommorow
+  elif len(tuple(c_days_tommorow.finditer(query))):
+
+    # get any day only in phrase
+    # EX: Tuesday
+    for match in c_days_tommorow.finditer(query):
+
+      # get all words following time
+      wordsupto = query[:match.start()]
+
+      # get where to start replacement, and how many words to replace
+      startreplaceat = len(wordsupto.strip().split(' '))
+      endreplaceat = startreplaceat + len(match.group().split(' '))
+
+      # calculate datetime object
+      time = dt.datetime.now() + dt.timedelta(days=1)
+
+      # create the data structure
+      data = {"type": "time", "when": time.strftime('%c'), "text": match.group(0)}
+
+      # do the replacing
+      resp[startreplaceat] = data
+      resp[startreplaceat+1:endreplaceat] = ''
+
+  # tommorow
+  elif len(tuple(c_days_yesterday.finditer(query))):
+
+    # get any day only in phrase
+    # EX: Tuesday
+    for match in c_days_yesterday.finditer(query):
+
+      # get all words following time
+      wordsupto = query[:match.start()]
+
+      # get where to start replacement, and how many words to replace
+      startreplaceat = len(wordsupto.strip().split(' '))
+      endreplaceat = startreplaceat + len(match.group().split(' '))
+
+      # calculate datetime object
+      time = dt.datetime.now() + dt.timedelta(days=-1)
+
+      # create the data structure
+      data = {"type": "time", "when": time.strftime('%c'), "text": match.group(0)}
+
+      # do the replacing
+      resp[startreplaceat] = data
+      resp[startreplaceat+1:endreplaceat] = ''
+
 
   return resp
 
