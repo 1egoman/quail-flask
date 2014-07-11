@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block title %}Home{% endblock title %}
+
+{% block contents_class %}{% endblock contents_class %}
+{% block contents %}
+<style>
+div.plugin {
+  margin-bottom: 8px;
+  border: 2px solid #DDD;
+}
+div.plugin div.title { 
+  background: #BBB; 
+  padding: 10px;
+}
+div.plugin div.data {
+  font-size: 1.2em;
+  padding: 10px;
+}
+</style>
+{{ body|safe }}
+{% endblock contents %}
+
+{% block scripts %}
+{% endblock scripts %}
