@@ -70,4 +70,3 @@ class WeatherPlugin(Plugin):
       j.write(dumps(self.lists, indent=2))
 
 
-  
