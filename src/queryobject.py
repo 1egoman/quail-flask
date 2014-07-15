@@ -35,7 +35,7 @@ def create_query_object(query, app):
   response = format_time(response, query)
   response = format_events(response, query, app)
   response = format_people(response, query, app)
-  print response
+  # print response
   return response
 
 
