@@ -50,6 +50,14 @@ class Plugin(object):
     """ Did this plugin do the previous query? """
     return bool( self.app.lastplugin and self.app.lastplugin["instance"] == self )
 
+  def get_me(self):
+    """ Gtet info about the person being talked to """
+    out = [a for a in self.app.people.data if type(a) == dict and a.has_key("tags") and "me" in a["tags"]]
+    if len(out):
+      return out
+    else:
+      return None
+
   def html_provider(self):
     return ""
 
