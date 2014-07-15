@@ -1,6 +1,7 @@
 from plugin import Plugin
 from network import STATUS_OK, Packet
 import datetime as dt
+import re
 
 CAL_ADD_WORDS = ["named", "called", "create", "add"]
 CAL_DEL_WORDS = ["named", "called", "check", "delete", "remove"]
@@ -12,7 +13,7 @@ notified = []
 class CalPlugin(Plugin):
 
   def validate(self):
-    return "calender" in self.query or "calendar" in self.query or "event" in self.query.as_str()
+    return "calender" in self.query or "calendar" in self.query or "event" in self.query.as_str() or len(re.findall("(happening|going on)", self.query.as_str()))
 
   def listener(self):
     now = dt.datetime.now()
@@ -91,6 +92,31 @@ class CalPlugin(Plugin):
           self.resp["text"] = "Cannot find event named %s" % name["name"]
           self.resp["status"] = STATUS_OK
           return
+
+    else:
+
+      # just list
+      when = [a for a in self.query if type(a) == dict and a["type"] == "time"]
+
+      if len(when):
+        # day is when
+        when = dt.datetime.strptime(when[0], '%c')
+      else:
+        # day is today
+        when = dt.datetime.today()
+
+      events = self.app.calender.events.year(when.year).month(when.month).day(when.day)
+      foundevents = events and re.findall(  "(%s)" % '|'.join([a["name"] for a in events]), self.query.as_str()  )
+
+      # are these events in the query?
+      if foundevents and len(foundevents):
+        self.resp["text"] = ','.join( foundevents )
+      else:
+        # just list all
+        self.resp["text"] = ' '.join(events) or "Nothing Today"
+        self.resp["status"] = STATUS_OK
+
+
 
 
 

@@ -25,7 +25,7 @@ class Calender(object):
     """ Add a new event to the calender """
     event = {}
     event["name"] = name
-    event["when"] = when.strftime('%c')
+    event["when"] = when and when.strftime('%c')
     event["where"] = where
     event.update(kwargs)
     self.events.append(event)
@@ -70,7 +70,7 @@ class EventList(list):
   def month(self, month):
     """ Get all events where month = 'month' """
     if type(month) == int:
-      return EventList([e for e in self if datetime.strptime(e["when"], '%c').strftime('%m') == month])
+      return EventList([e for e in self if int(datetime.strptime(e["when"], '%c').strftime('%m')) == month])
     else:
       return EventList([e for e in self if datetime.strptime(e["when"], '%c').strftime('%B') == str(month) or datetime.strptime(e["when"], '%c').strftime('%b') == str(month)])
 
