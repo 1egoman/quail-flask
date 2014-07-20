@@ -10,8 +10,8 @@ def parse_weather(self, when, where, API_KEY):
     conditions = None
     today = False
     # if there is no time, create one (means most likely that weather for today is requested)
-    if not (type(when) == dict and when.has_key("when") and when["when"][2] != dt.datetime.now().day):
-      when = {"when": [dt.datetime.now().year, dt.datetime.now().month, dt.datetime.now().day]}
+    if not (type(when) == list and when[2] != dt.datetime.now().day):
+      when = [dt.datetime.now().year, dt.datetime.now().month, dt.datetime.now().day]
 
       # get today's conditions
       u = urllib2.urlopen("http://api.wunderground.com/api/%s/conditions/q/autoip.json" % API_KEY)
@@ -25,7 +25,7 @@ def parse_weather(self, when, where, API_KEY):
 
 
     # find correct day
-    w = [w for w in weather if w["date"]["year"] == when["when"][0] and w["date"]["month"] == when["when"][1] and w["date"]["day"] == when["when"][2]]
+    w = [w for w in weather if w["date"]["year"] == when[0] and w["date"]["month"] == when[1] and w["date"]["day"] == when[2]]
     
     if len(w):
 
@@ -117,6 +117,4 @@ def parse_weather(self, when, where, API_KEY):
       if today:
         self.resp["text"] = "%s degrees, and %s" % (todayconditions["feelslike_f"], conditions)
       else:
-        self.resp["text"] = "high of %s degrees, low of %s, and " % (high, low, conditions)
-
-
+        self.resp["text"] = "high of %s degrees, low of %s, and %s for %s %s, %s" % (high, low, conditions, dt.datetime.strptime(str(when[1]), '%m').strftime('%B'), when[2], when[0])

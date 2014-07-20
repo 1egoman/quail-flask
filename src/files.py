@@ -5,7 +5,10 @@ class UserFiles(object):
 
   def __init__(self, app):
     self.app = app
-    self.upload_dir = os.path.abspath( self.app.config["upload-folder"] )
+    if self.app.config.has_key("upload-folder"):
+      self.upload_dir = os.path.abspath( self.app.config["upload-folder"] )
+    else:
+      self.upload_dir = os.path.abspath( "uploads" )
 
     # make sure folder exists
     if not os.path.isdir(self.upload_dir):

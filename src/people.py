@@ -24,6 +24,19 @@ class PeopleContainer(object):
       else:
         self.data = []
 
+    # convert to datetime objects
+    for p in self.data:
+      for k,v in p.items():
+
+        # try and convert to dateime object, if possible
+        try:
+          p[k] = datetime.strptime(v, '%c')
+        except TypeError: pass
+        except ValueError: pass
+
+  def __iter__(self): return iter(self.data)
+
+
   def sync(self):
     """ Sync the file and the program's list """
     with open( self.cfgpath, 'w' ) as f:
@@ -33,3 +46,11 @@ class PeopleContainer(object):
     """ Add a new person to the list of known people """
     person = PERSONTEMPLATE.copy().update(person)
     self.data.append(person)
+
+
+class Person(dict):
+
+  def __init__(self, *args, **kwargs):
+    super(self, Person).__init__(*args, **kwargs)
+
+    self.__dict__ = self

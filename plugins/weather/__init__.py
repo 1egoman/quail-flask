@@ -55,8 +55,7 @@ class WeatherPlugin(Plugin):
         out = dt.datetime.strptime(when[0]["when"], '%c').strftime("%Y:%m:%d:%X").replace("/", ":")
         when = [int(d) for d in out.split(":")]
       else:
-        out = dt.datetime.now().strftime("%Y:%m:%d:%X").replace("/", ":")
-        when = [int(d) for d in out.split(":")]
+        when = None
 
 
       wtr.parse_weather(self, when, "", WEATHER_API_KEY)

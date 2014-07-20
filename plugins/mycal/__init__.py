@@ -1,6 +1,7 @@
 from plugin import Plugin
 from network import STATUS_OK, Packet
 import datetime as dt
+import time
 import re
 
 CAL_ADD_WORDS = ["named", "called", "create", "add"]
@@ -20,7 +21,10 @@ class CalPlugin(Plugin):
 
     # any events coming up?
     for event in self.app.calender.events:
-      when = dt.datetime.strptime(event["when"], '%c')
+      try:
+        when = dt.datetime.strptime(event["when"], '%c')
+      except TypeError:
+        when = dt.datetime.strptime(event["when"][0], '%c')
 
       donotify = (event.has_key("tags") and "nonotify" not in event["tags"]) or (not event.has_key("tags"))
       if when.hour == now.hour and when.minute == now.minute and donotify and event["name"] not in notified:
@@ -39,10 +43,10 @@ class CalPlugin(Plugin):
     if len([1 for t in CAL_ADD_WORDS if t in self.query]):
 
       # get when
-      time = None
+      timeq = None
       when = [w for w in self.query if type(w) == dict and w["type"] == "time"]
       if len(when):
-        time = dt.datetime.strptime(when[0]["when"], '%c')
+        timeq = dt.datetime.strptime(when[0]["when"], '%c')
       
       # get name
       start = None
@@ -62,10 +66,10 @@ class CalPlugin(Plugin):
               break
 
       # add it
-      self.app.calender.add_event(name=name, when=time)
+      self.app.calender.add_event(name=name, when=timeq)
 
       self.resp["status"] = STATUS_OK
-      self.resp["text"] = "Added %s to %s" % ( name, time.strftime("%A, %B %d, %Y") )
+      self.resp["text"] = "Added %s to %s" % ( name, timeq.strftime("%A, %B %d, %Y") )
 
     # delete
     elif len([1 for t in CAL_DEL_WORDS if t in self.query]):

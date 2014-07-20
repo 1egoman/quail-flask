@@ -1,22 +1,52 @@
-{% extends "layout.html" %}
+{% extends "header.html" %}
 
 {% block title %}Results{% endblock title %}
 
-{% block contents_class %}
-  {% if query[0].has_key("color") %}
-    {{ query[0]["color"] }}
-  {% endif %}
+{% block style %}
+<style>
+/* query */
+div.page-content { min-height: 500px; }
+h1.big {
+  font-size: 60px;
+  text-align: center;
+  margin: 20px 0px 100px 0px;
+  color: rgba(26, 26, 26, 0.75);
+  padding-bottom: 50px;
+}
 
-{% endblock contents_class %}
-{% block contents %}
-<!-- {{ query[0]|tojson }} -->
-<h1 class="big">Quail says...</h1>
-<h1 class="big queryresponse">
-  {{ query[0]["text"] }}
-</h1>
-{% endblock contents %}
+h1.big.queryresponse {
+  font-size: 100px;
+  text-align: center;
+  color: #1A1A1A;
 
-{% block scripts %}
+  white-space: nowrap;
+}
+
+h1.big.queryresponse:before, h1.big.queryresponse:after { content: '"'; }
+
+.blue { background: #BBE7FB; }
+.red { background: #FBBBBD; }
+.yellow { background: #FBF6BB; }
+.orange { background: #fBD9BB; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="page cal">
+  <div class="page-header">
+    Results
+  </div>
+  <div class="page-content">
+    <!-- {{ query[0]|tojson }} -->
+    <h1 class="big">Quail says...</h1>
+    <h1 class="big queryresponse">
+      {{ query[0]["text"] }}
+    </h1>
+  </div>
+</div>
+{% endblock body %}
+
+{% block script %}
 <script src="../../static/js/jq.quickfit.js"></script>
 <script type="text/javascript">$("h1.big.queryresponse").bigText();</script>
-{% endblock scripts %}
+{% endblock script %}

@@ -1,21 +1,123 @@
-{% extends "layout.html" %}
+{% extends "header.html" %}
+{% block style %}
+  <link rel="stylesheet" type="text/css" href="/static/css/quail-cal.css">
+{% endblock %}
+{% block body %}
 
-{% block title %}Results{% endblock title %}
+    <!-- calender -->
+    <div class="page cal" ng-controller="CalController as CalCtrl">
+      <div class="page-header">
+        Calendar for {{ title }}
+        <a href="/cal" class="btn btn-primary">Now</a>
+        <ul class="pagination" style="float: right; font-size: 0.8em; margin: 0px;">
+          <li><a href="/cal/{% if now.month > 1 %}{{now.month-1}}/{{now.year}}{% else %}12/{{now.year-1}}{% endif %}">&laquo;</a></li>
+          <li class="active"><a href>{{now.month}}/{{now.year}}</a></li>
+          <li><a href="/cal/{% if now.month < 12 %}{{now.month+1}}/{{now.year}}{% else %}1/{{now.year+1}}{% endif %}">&raquo;</a></li>
+        </ul>
+      </div>
+      <div class="page-content">
+        <div id="calendar" class="cal-context" style="width: 100%;">
 
-{% block contents_class %}
-  {% if query[0].has_key("color") %}
-    {{ query[0]["color"] }}
-  {% endif %}
+          <div class="cal-row-fluid cal-row-head">
+              <div class="cal-cell1">Sunday</div>
+              <div class="cal-cell1">Monday</div>
+              <div class="cal-cell1">Tuesday</div>
+              <div class="cal-cell1">Wednesday</div>
+              <div class="cal-cell1">Thursday</div>
+              <div class="cal-cell1">Friday</div>
+              <div class="cal-cell1">Saturday</div>
+          </div>
 
-{% endblock contents_class %}
-{% block contents %}
-<h1 class="big">Quail says...</h1>
-<h1 class="big queryresponse">
-  {{ query[0]["text"] }}
-</h1>
-{% endblock contents %}
+          <div class="cal-month-box">
+            {% for week in events %}
+              <!-- each week -->
+              <div class="cal-row-fluid cal-before-eventlist">
 
-{% block scripts %}
-<script src="../../static/js/jq.quickfit.js"></script>
-<script type="text/javascript">$("h1.big.queryresponse").bigText();</script>
-{% endblock scripts %}
+                {% for day in week %}
+                  <!-- each day -->
+                  <div class="cal-cell1 cal-cell" data-cal-row="-day2" ng-repeat="day in week" data-events="{{ day.events }}">
+                    <div class="cal-month-day cal-day-{{day.month}}month cal-month-first-row">
+
+                      <span class="pull-right" data-cal-date="2013-02-25" data-cal-view="day" data-toggle="tooltip" title="" data-original-title="">{{ day.day }}</span>
+
+                      <div class="events-list">
+                        {% for evt in day.events %}
+                        <!-- <a href data-event-class="event-warning" class="pull-left event event-warning"></a> -->
+                          <a 
+                          data-event-class="event-{{ evt.color or "yellow" }}" 
+                          class="pull-left event event-{{ evt.color or "yellow" }}"  
+                          data-toggle="popover" 
+                          data-title="{{ evt.name }}" 
+                          data-day="{{ evt.when }}"
+                          data-content="
+                          <strong>When:</strong> {{ evt.when }} 
+                          {% if evt.where %}
+                            <br/>
+                            <strong>Where:</strong> {{ evt.where }} 
+                          {% endif %}">{{ evt.name }}</a>
+                        {% endfor %}
+
+                      </div>
+
+
+                    </div>
+                  </div>
+                {% endfor %}
+
+              </div>
+            {% endfor %}
+
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+          
+ 
+{% endblock %}
+{% block script %}
+    <script>
+
+    // create popovers
+    // http://stackoverflow.com/questions/7703878/how-can-i-hold-twitter-bootstrap-popover-open-until-my-mouse-moves-into-it
+    var timeoutObj;
+    $('.event').popover({
+        offset: 10,
+        trigger: 'manual',
+        html: true,
+        placement: 'bottom',
+        animate: true,
+        container: 'body',
+        template: '<div class="popover" onmouseover="clearTimeout(timeoutObj);"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
+    }).click(function(e) {
+
+        $('html').on('click',function() {
+          alert()
+        });
+
+        $("div.cal-month-box .cal-row-fluid .cal-cell").css("background", "transparent");
+        $(".popover").popover("hide");
+        $(this).popover('show');
+    });
+
+    $('.event').on('show.bs.popover', function () {
+      var popover = $(this);
+      $("div.cal-month-box .cal-row-fluid").each(function(e){
+        var week = $(this)
+        week.find(".cal-cell").each(function(e){
+          // is this the day for this event?
+          if ( $(this).attr("data-events").indexOf( popover.attr("data-day") ) !== -1 ) {
+            $(this).css("background", "rgba(66, 139, 202, 0.5)")
+          }
+        });
+      });
+
+    });
+
+    $('.event').on('hide.bs.popover', function () {
+      $("div.cal-month-box .cal-row-fluid .cal-cell").css("background", "initial");
+      alert()
+    });
+    </script>
+{% endblock %}
