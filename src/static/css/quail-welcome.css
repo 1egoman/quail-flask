@@ -1,0 +1,49 @@
+html,body {
+  background: #1A8BBC;
+}
+
+img.center {
+  width: 75%;
+  display: block;
+  margin: 4% auto;
+}
+
+img.shrunk {
+  width: 40%;
+  display: block;
+  margin: 2% auto;
+}
+
+.btn-next {
+  font-size: 2em;
+}
+
+.ng-invalid:not(.ng-pristine) {
+  border-color: #c74436;
+}
+
+/*.modal-backdrop { 
+  background: transparent; 
+  position: static;
+}
+*/
+p.tags {
+  font-size: 1.4em;
+  color: #bbb;
+}
+
+div.person {
+  position: relative;
+}
+
+div.step4-modal-lg button.close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+
+  font-size: 3em;
+}
+
+div.bootstrap-tagsinput {
+  width: 100%;
+}

@@ -1,0 +1,104 @@
+
+body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background: #1ABC9C;
+}
+
+/* header */
+header {
+
+  position: absolute;
+  top: 12px;
+  left: 0px;
+  right: 0px;
+  height: 84px;
+
+  padding: 16px 0px;
+
+  background-color: #FFF;
+}
+
+div.take-up-header { height: 64px; }
+
+header div.inside {
+  width: 1200px;
+  margin: 0px auto;
+}
+
+header div.inside img {
+  height: 76px;
+}
+
+header ul {
+  list-style-type: none;
+  float: right;
+  margin-top: 16px;
+}
+
+header ul li {
+  display: inline-block;
+  padding: 0px 16px;
+}
+
+header ul li a {
+  color: #999;
+  font-size: 1.3em;
+  text-decoration: none;
+  padding: 0px 6px;
+}
+
+/* for list items */
+@-webkit-keyframes HEADER_HOVER {
+  0%   { 
+    border-bottom: 0px solid rgba(26, 140, 189, 0);
+    padding-bottom: 24px;
+    }
+  100% { 
+    border-bottom: 12px solid rgba(26, 140, 189, 1);
+    padding-bottom: 12px;
+    }
+}
+@-moz-keyframes HEADER_HOVER {
+  0%   { 
+    border-bottom: 0px solid rgba(26, 140, 189, 0);
+    padding-bottom: 24px;
+    }
+  100% { 
+    border-bottom: 12px solid rgba(26, 140, 189, 1);
+    padding-bottom: 12px;
+    }
+}
+@-o-keyframes HEADER_HOVER {
+  0%   { 
+    border-bottom: 0px solid rgba(26, 140, 189, 0);
+    padding-bottom: 24px;
+    }
+  100% { 
+    border-bottom: 12px solid rgba(26, 140, 189, 1);
+    padding-bottom: 12px;
+    }
+}
+@keyframes HEADER_HOVER {
+  0%   { 
+    border-bottom: 0px solid rgba(26, 140, 189, 0);
+    padding-bottom: 24px;
+    }
+  100% { 
+    border-bottom: 12px solid rgba(26, 140, 189, 1);
+    padding-bottom: 12px;
+    }
+}
+
+header ul li:hover a {
+  color: rgb(26, 140, 189);
+  padding-bottom: 12px;
+  border-bottom: 12px solid rgb(26, 140, 189);
+  text-decoration: none;
+
+  overflow: none;
+
+  -webkit-animation: HEADER_HOVER 0.15s 1; /* Safari 4+ */
+  -moz-animation:    HEADER_HOVER 0.15s 1; /* Fx 5+ */
+  -o-animation:      HEADER_HOVER 0.15s 1; /* Opera 12+ */
+  animation:         HEADER_HOVER 0.15s 1; /* IE 10+, Fx 29+ */
+}

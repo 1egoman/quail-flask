@@ -1,0 +1,54 @@
+<!-- add person modal -->
+<div class="modal fade new-person" ng-controller="People as PeopleCtrl">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+          <span aria-hidden="true">&times;</span>
+          <span class="sr-only">Close</span>
+        </button>
+        <h4 class="modal-title">Add person</h4>
+      </div>
+      <div class="modal-body">
+        
+        <form novalidate>
+
+
+          <div class="form-group">
+            <div class="input-group">
+              <span class="input-group-addon">First</span>
+              <input type="text" class="form-control" name="fname" style="display: inline-block;" ng-model="PeopleCtrl.NewPerson.fname"/>
+            </div>
+          </div>
+
+
+          <div class="form-group">    
+            <div class="input-group">
+              <span class="input-group-addon">Last</span>
+              <input type="text" class="form-control" name="lname" ng-model="PeopleCtrl.NewPerson.lname"/>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="input-group">
+              <span class="input-group-addon">Birthday</span>
+              <input type="datetime-local" class="form-control" ng-model="PeopleCtrl.NewPerson.birthday"/>
+            </div>
+          </div>
+
+          <div class="form-group well">
+            <input type="text" data-role="tagsinput" placeholder="Tags" ng-model="PeopleCtrl.NewPerson.tags"/>
+            <p class="help-block">Hit [tab] between each tag</p>
+          </div>
+
+
+        </form>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="PeopleCtrl.addPerson()">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>

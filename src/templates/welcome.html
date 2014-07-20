@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome to Quail.</title>
+
+    <!-- Bootstrap -->
+    <link href="static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="static/css/datepicker.css">
+    <link rel="stylesheet" type="text/css" href="static/css/bootstrap-tagsinput.css">
+
+    <link rel="stylesheet" type="text/css" href="static/css/quail-welcome.css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      ">">https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js">
+      ">">https://oss.maxcdn.com/respond/1.4.2/respond.min.js">
+    <![endif]-->
+  </head>
+  <body ng-app="QuailWelcome">
+    
+    <div class="controller_iterator" ng-controller="PageFlipper as pfCtrl"> 
+
+
+
+      <!-- page 1 -->
+      <div class="container" ng-show="pfCtrl.page == 0">
+
+        <img src="http://quail.rgaus.net/static/images/quailnourl.svg" class="center"/>
+
+        <button ng-click="pfCtrl.next()" class="btn btn-block btn-next" data-toggle="modal" data-target=".step2-modal-lg" data-backdrop="static">Set up Quail</button>
+
+      </div>
+
+
+
+
+
+      <!-- License -->
+      <div class="">
+
+        <div class="modal fade step2-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <!-- <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button> -->
+                  <h4 class="modal-title" id="LargeModalLabel">Accept Quail's License</h4>
+                </div>
+                <div class="modal-body">
+                  <pre>
+The MIT License (MIT)
+
+Copyright (c) 2014 Ryan Gaus
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.</pre>
+
+                <button class="btn btn-success" onclick="$('.step2-modal-lg').modal('hide')" data-toggle="modal" data-target=".step3-modal-lg" data-backdrop="static">I accept</button>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+      </div>
+
+
+
+
+      <!-- Basic Info (quail.json) -->
+      <div class="">
+
+        <div class="modal fade step3-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <!-- <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button> -->
+                  <h4 class="modal-title" id="LargeModalLabel">Basic Server Information</h4>
+                </div>
+                <div class="modal-body" ng-controller="BasicInfo as BasicCtrl">
+                  
+                  <form novalidate name="BasicForm">
+
+
+                    <!-- host -->
+                    <label for="host">Host: </label>
+                    <input type="text" name="host" id="host" class="form-control" ng-model="BasicCtrl.data.host" required />
+                    <p class="help-block">127.0.0.1 will allow only local users to access, while 0.0.0.0 will allow anyone to access.</p>
+
+                    <!-- port -->
+                    <label for="port">Port: </label>
+                    <input type="number" name="port" id="port" class="form-control" ng-model="BasicCtrl.data.port" required />
+                    <p class="help-block">The port must be between 1024 and 65535</p>
+
+                    <!-- secret -->
+                    <label for="secret">Secret: </label>
+                    <input type="password" name="secret" id="secret" class="form-control" ng-model="BasicCtrl.data.secret" ng-minlength=3 required />
+                    <p class="help-block">This is a key needed to send any server queries. Make it secure! (Must be &gt; 3 characters)</p>
+
+
+                    <input type="submit" 
+                    class="btn btn-success" 
+                    ng-click="BasicCtrl.update(BasicCtrl.data)" 
+                    ng-disabled="BasicForm.$invalid" 
+                    value="Save Server Information" 
+                    onclick="$('.step3-modal-lg').modal('hide')" 
+                    data-toggle="modal" 
+                    data-target=".step4-modal-lg" 
+                    data-backdrop="static"/>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+      </div>
+
+
+
+      <div class="modal fade step4-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+
+            <div class="modal-header">
+              <!-- <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button> -->
+              <h4 class="modal-title" id="LargeModalLabel">Complete!</h4>
+            </div>
+            <div class="modal-body" ng-controller="People as PeopleCtrl">
+              
+              <h1>Please restart Quail.</h1>
+
+          </div>
+        </div>
+      </div>
+
+
+      <!-- People -->
+      <div style="display: none;">
+
+        <div class="modal fade step4-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <!-- <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button> -->
+                  <h4 class="modal-title" id="LargeModalLabel">Add People</h4>
+                </div>
+                <div class="modal-body" ng-controller="People as PeopleCtrl">
+                  
+                  <!-- add person -->
+                  <label for="add"></label>
+                  <button name="add" id="add" class="btn btn-primary" ng-model="BasicCtrl.data.host" data-toggle="modal" data-target=".new-person" >Add New person</button>
+                  <br/>
+
+
+                  <!-- list people -->
+                  {% raw %}
+                  <div class="peopleContainer" ng-repeat="p in PeopleCtrl.people">
+                    
+                    <div class="person">
+                      {{ p }}
+                      <!-- <h1>{{ person.name[0] + " " + person.name[1] }}</h1> -->
+                      <!-- <p class="tags">{{ PeopleCtrl.getTags(person) }}</p> -->
+
+                      <button type="button" class="close" ng-click="PeopleCtrl.removePerson(person.data)">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                      </button>
+
+                    </div>
+
+                  </div>
+                  {% endraw %}
+
+                  <br/>
+                  <button
+                  class="btn btn-success" 
+                  ng-click="BasicCtrl.update(BasicCtrl.data)" 
+                  ng-disabled="BasicForm.$invalid" 
+                  onclick="$('.step3-modal-lg').modal('hide')" 
+                  data-toggle="modal" 
+                  data-target=".step4-modal-lg" 
+                  data-backdrop="static">Continue</button>
+
+              </div>
+            </div>
+          </div>
+
+      </div>
+
+
+      <!-- add person modal -->
+      <div class="modal fade new-person" ng-controller="People">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span>
+                <span class="sr-only">Close</span>
+              </button>
+              <h4 class="modal-title">Add person</h4>
+            </div>
+            <form novalidate>
+              <div class="modal-body">
+                
+
+
+                  <div class="form-group">
+                    <div class="input-group">
+                      <span class="input-group-addon">First</span>
+                      <input type="text" class="form-control" name="fname" ng-model="NewPerson.fname"/>
+                    </div>
+                  </div>
+
+
+                  <div class="form-group">    
+                    <div class="input-group">
+                      <span class="input-group-addon">Last</span>
+                      <input type="text" class="form-control" name="lname" ng-model="NewPerson.lname"/>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <div class="input-group">
+                      <span class="input-group-addon">Birthday</span>
+                      <input type="datetime-local" class="form-control" ng-model="NewPerson.birthday"/>
+                    </div>
+                  </div>
+
+                  <div class="form-group well">
+                    <input type="text" data-role="tagsinput" placeholder="Tags" ng-model="NewPerson.tags"/>
+                    <p class="help-block">Hit [tab] between each tag</p>
+                  </div>
+
+
+
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="addNewPerson()">Save changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+
+
+    </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="static/js/typeahead.js"></script>
+    <script src="static/js/bootstrap-tagsinput.min.js"></script>
+
+    <script src="static/js/angular.min.js"></script>
+    <script src="static/js/welcome/app.js"></script>
+    <script src="static/js/bootstrap-tagsinput-angular.js"></script>
+
+  </body>
+</html>
