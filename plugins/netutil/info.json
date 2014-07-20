@@ -1,0 +1,6 @@
+{
+  "name": "netutil",
+  "desc": "Network utilities",
+  "author": "Ryan Gaus",
+  "plugin": "NetUtilPlugin"
+}
