@@ -147,29 +147,6 @@ class App(object):
         response["text"] = filename
         return Response(dumps( response.format() ),  mimetype='application/json')
 
-  def web_gui(self, secret, plugin=None, path="/"):
-    """ Web interface for quail interaction """
-    html = ""
-    root = ""
-
-    # quail's site
-    if not plugin:
-
-      if request.args.has_key("query"):
-        text = request.args.get("query")
-        q = loads(self.do_query(self.config["secret"], query=text, n=1).data)
-        html = render_template(  os.path.join(root, "old/query.html"), query=q  )
-
-      elif path == "/":
-        t = ""
-        for plugin in self.manager.plugins:
-          html = plugin["instance"].html_provider()
-          if html:
-            t += "<div class=\"plugin\"><div class=\"title\">%s</div><div class=\"data\">%s</div></div>" % (plugin["instance"].__class__.__name__, html)
-        html = render_template( os.path.join(root, "old/index.html"), body=t)
-
-    return html
-
 
 
 
@@ -292,12 +269,6 @@ class App(object):
 
     # uploading of files
     self.flask.add_url_rule("/v2/<secret>/upload", "upload", methods=["POST"], view_func=self.upload_resource)
-
-    # web interface
-    self.flask.add_url_rule("/v2/<secret>/web", "web", view_func=self.web_gui)
-    self.flask.add_url_rule("/v2/<secret>/web/<path>", "web", view_func=self.web_gui)
-    self.flask.add_url_rule("/v2/<secret>/<plugin>/web", "web", view_func=self.web_gui)
-    self.flask.add_url_rule("/v2/<secret>/<plugin>/web/<path>", "web", view_func=self.web_gui)
 
     # web interface
     self.flask.add_url_rule("/", "newweb", view_func=self.web)
