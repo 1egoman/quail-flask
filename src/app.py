@@ -1,6 +1,7 @@
 from flask import *#Flask, Response, url_for, jsonify, redirect, request, redner_template
 from werkzeug.utils import secure_filename
 from json import dumps, loads
+from temboo.core.session import TembooSession
 import os
 import datetime
 
@@ -56,6 +57,14 @@ class App(object):
     thrd.daemon = True
     thrd.start()
 
+    # start temboo
+    if self.config.has_key("temboo-user") and self.config.has_key("temboo-pass"):
+      self.session = TembooSession(self.config["temboo-user"], "quail-flask", self.config["temboo-pass"])
+      print " * Temboo is enabled"
+    else:
+      self.session = None
+
+    # start quail
     self.run(**flask_args)
 
 
