@@ -20,12 +20,12 @@ class ExersizePlugin(Plugin):
 
     # what event?
     if "walk" in self.query.as_str():
-      self.app.calender.add_event(name="Walking", when=datetime.now(), tags=["walk", "exercise", "nonotify"])
+      self.app.calender.add_event(name="Walking", when=datetime.now(), tags=["walk", "exercise", "nonotify"], color="green")
       self.resp["status"] = STATUS_OK
       self.resp["text"] = "You are walking today."
 
     elif "strength" in self.query.as_str() or "weights" in self.query.to_str():
-      self.app.calender.add_event(name="Strength", when=datetime.now(), tags=["strength", "exercise", "nonotify"])
+      self.app.calender.add_event(name="Strength", when=datetime.now(), tags=["strength", "exercise", "nonotify"], color="green")
       self.resp["status"] = STATUS_OK
       self.resp["text"] = "You are doing strength today."
 

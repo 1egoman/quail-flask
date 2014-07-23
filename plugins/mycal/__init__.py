@@ -6,6 +6,7 @@ import re
 
 CAL_ADD_WORDS = ["named", "called", "create", "add"]
 CAL_DEL_WORDS = ["named", "called", "check", "delete", "remove"]
+CAL_DEL_WORDS = ["named", "called", "check", "delete", "remove"]
 STRIP_WORDS = ["to", "from", "on", "in", "by", "list"]
 WHEN_WORDS = ["at", "for"]
 
@@ -14,7 +15,7 @@ notified = []
 class CalPlugin(Plugin):
 
   def validate(self):
-    return "calender" in self.query or "calendar" in self.query or "event" in self.query.as_str() or len(re.findall("(happening|going on)", self.query.as_str()))
+    return "calender" in self.query or "calendar" in self.query or "event" in self.query.as_str() or "cal" in self.query or "event" in self.query.as_str()
 
   def listener(self):
     now = dt.datetime.now()
@@ -23,8 +24,7 @@ class CalPlugin(Plugin):
     for event in self.app.calender.events:
       try:
         when = dt.datetime.strptime(event["when"], '%c')
-      except TypeError:
-        when = dt.datetime.strptime(event["when"][0], '%c')
+      except TypeError: pass
 
       donotify = (event.has_key("tags") and "nonotify" not in event["tags"]) or (not event.has_key("tags"))
       if when.hour == now.hour and when.minute == now.minute and donotify and event["name"] not in notified:
@@ -80,6 +80,14 @@ class CalPlugin(Plugin):
         name = [w for w in self.query if type(w) == dict and w["type"] == "event"]
         if len(name):
           name = name[0]
+
+        # get when (FIXME no comparison)
+        timeq = None
+        when = [w for w in self.query if type(w) == dict and w["type"] == "time"]
+        if len(when):
+          timeq = when[0]["when"]
+        else:
+          timeq = None
 
 
         # delete it

@@ -84,7 +84,8 @@ def format_time(resp, query):
   c_days_tommorow = re.compile("tommorow")
   c_days_yesterday = re.compile("yesterday")
   c_days_and_times = re.compile("(Mon|mon|Monday|monday|Tue|Tuesday|tuesday|tue|Wed|wed|Wednesday|wednesday|thurs|Thurs|Thursday|thursday|Fri|fri|Friday|friday|sat|Sat|Saturday|saturday|sun|Sun|Sunday|sunday) .* ?([0-2]?[0-9]):([0-6]?[0-9]) ?(pm|PM|Pm|p\.m\.|am|AM|Am|a\.m\.)")
-  
+  c_date = re.compile("(1?[0-9])/([0-3]?[0-9])/([0-9]*)")
+
   # if both matched...
   if len(tuple(c_days_and_times.finditer(query))):
 
@@ -265,6 +266,28 @@ def format_time(resp, query):
       resp[startreplaceat] = data
       resp[startreplaceat+1:endreplaceat] = ''
 
+
+  # date (ex: 1/1/2001)
+  elif len(tuple(c_date.finditer(query))):
+
+    for match in c_date.finditer(query):
+
+      # get all words following time
+      wordsupto = query[:match.start()]
+
+      # get where to start replacement, and how many words to replace
+      startreplaceat = len(wordsupto.strip().split(' '))
+      endreplaceat = startreplaceat + len(match.group().split(' '))
+
+      # calculate datetime object
+      time = dt.datetime(int(match.group(3)), int(match.group(1)), int(match.group(2)))
+
+      # create the data structure
+      data = {"type": "time", "when": time.strftime('%c'), "text": match.group(0)}
+
+      # do the replacing
+      resp[startreplaceat] = data
+      resp[startreplaceat+1:endreplaceat] = ''
 
   return resp
 

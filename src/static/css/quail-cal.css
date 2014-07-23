@@ -523,3 +523,13 @@ a.cal-event-week {
 .today {
   background: rgba(66, 139, 202, 0.1);
 }
+
+.cal-cell .plus span {
+  display: none;
+  position: absolute;
+  top: 6px;
+  left: 6px;
+}
+.cal-cell:hover .plus span {
+  display: block;
+}

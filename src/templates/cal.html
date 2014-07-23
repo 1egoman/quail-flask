@@ -38,6 +38,10 @@
                   <div class="cal-cell1 cal-cell" data-cal-row="-day2" ng-repeat="day in week" data-events="{{ day.events }}">
                     <div class="cal-month-day cal-day-{{day.month}}month cal-month-first-row">
 
+                      <button type="button" class="close plus" data-day="{{now.month}}/{{day.day}}/{{now.year}}">
+                        <span class="glyphicon glyphicon-new-window"></span>
+                      </button>
+
                       <span class="pull-right" data-cal-date="2013-02-25" data-cal-view="day" data-toggle="tooltip" title="" data-original-title="">{{ day.day }}</span>
 
                       <div class="events-list">
@@ -54,7 +58,14 @@
                           {% if evt.where %}
                             <br/>
                             <strong>Where:</strong> {{ evt.where }} 
-                          {% endif %}">{{ evt.name }}</a>
+                          {% endif %}
+                          {% if evt.tags %}
+                            <br/>
+                            <strong>Tags:</strong> {{ ', '.join(evt.tags) }} 
+                          {% endif %}">
+                            {{ evt.name }}
+                            <span class="delete-event" data-name="{{ evt.name }}">×</span>
+                          </a>
                         {% endfor %}
 
                       </div>
@@ -73,11 +84,27 @@
         </div>
       </div>
     </div>
+
+
           
  
 {% endblock %}
 {% block script %}
     <script>
+        next = false;
+
+    $("button.plus").click(function() {
+      var day = "add <name> to cal "+$(this).attr("data-day")
+      $("form.navbar-form input[type=text]").val( $("form.navbar-form input[type=text]").val()+day );
+      $("form.navbar-form input[type=text]").focus()
+      $("form.navbar-form input[type=text]")[0].setSelectionRange(4, 10)
+    });
+
+    $("a span.delete-event").click(function( evt ) {
+      var day = "cal delete "+$(this).attr("data-name")
+      $("form.navbar-form input[type=text]").val( $("form.navbar-form input[type=text]").val()+day );
+      $("form.navbar-form input[type=text]").focus();
+    });
 
     // create popovers
     // http://stackoverflow.com/questions/7703878/how-can-i-hold-twitter-bootstrap-popover-open-until-my-mouse-moves-into-it
@@ -92,14 +119,27 @@
         template: '<div class="popover" onmouseover="clearTimeout(timeoutObj);"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
     }).click(function(e) {
 
-        $('html').on('click',function() {
-          alert()
-        });
-
         $("div.cal-month-box .cal-row-fluid .cal-cell").css("background", "transparent");
         $(".popover").popover("hide");
         $(this).popover('show');
+        next = true;
     });
+
+    // hide popovers
+    $(document).on('click',function(e) {
+      if(!$(e.target).is('.event')) {
+        if (next) {
+          $(".popover").popover("hide");
+          $(this).css("background", "transparent")
+          next = false;
+          // console.log(next)
+        } else {
+          next = true;
+          // console.log(next)
+        }
+      }
+    });
+
 
     $('.event').on('show.bs.popover', function () {
       var popover = $(this);
@@ -117,7 +157,7 @@
 
     $('.event').on('hide.bs.popover', function () {
       $("div.cal-month-box .cal-row-fluid .cal-cell").css("background", "initial");
-      alert()
     });
-    </script>
+
+    </script> 
 {% endblock %}

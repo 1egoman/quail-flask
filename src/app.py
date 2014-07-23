@@ -67,9 +67,8 @@ class App(object):
     # start quail
     self.run(**flask_args)
 
-
-  def do_query(self, query="", plugin_name=None, n=0):
-    """ Perform a query. Can be called by flask or another process """
+  def do_query(self, query="", plugin_name=None, n=0, secret=None, local=False):
+    """ Perform a query. Can be called by flask or another process (set local = True)"""
 
     # get information about the user
     n = n or request.args.get("n") or 0
@@ -77,7 +76,13 @@ class App(object):
 
     # are we autorized?
     response = None
+    if local == False and secret != self.config["secret"]:
+      p = Packet()
+      p["status"] = STATUS_ERR
+      p["text"] = "bad key"
+      return Response(dumps(p.format()),  mimetype='application/json')
 
+    # there is a query...
     if len(query):
 
       # check the last used plugin first
@@ -146,9 +151,6 @@ class App(object):
         response["status"] = STATUS_OK
         response["text"] = filename
         return Response(dumps( response.format() ),  mimetype='application/json')
-
-
-
 
   def calendar(self, month=0, year=0):
     """ Web interface for quail interaction """
@@ -222,7 +224,6 @@ class App(object):
     # render output
     return render_template( os.path.join(root, "cal.html"), events=weeksout, title=now.strftime("%B %Y"),now=now)
 
-
   def web(self):
     """ Web interface for quail interaction """
     root = ""
@@ -232,7 +233,6 @@ class App(object):
       return render_template( os.path.join(root, "welcome.html"))
     else:
       return render_template( os.path.join(root, "index.html"))
-
 
   def updatequaildotjson(self):
     """ Update config/quail.json file """
@@ -252,9 +252,8 @@ class App(object):
       return "OK"
     return "NO DATA OR PERMISSION DENIED"
 
-
   def web_query(self):
-    q = self.do_query( request.args.get('q') )
+    q = self.do_query( request.args.get('q'), local=True)
     return render_template( "query.html", query=loads(q.data) )
     
   def run(self, **flask_args):
