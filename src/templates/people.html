@@ -1,0 +1,96 @@
+{% extends "header.html" %}
+{% block style %}
+<link rel="stylesheet" type="text/css" href="/static/css/quail-people.css">
+{% endblock %}
+{% block body %}
+
+<!-- just an id -->
+{% if id is defined %}
+  <div class="page people">
+    <div class="page-header">
+      People
+    </div>
+    <div class="page-content row">
+      <!-- list of people -->
+      <ul class="col-md-4 list">
+        {% for person in people %}
+          <li class="{% if person.id == id %}active{% endif %}">
+            <a href="/people/{{person.id}}">
+              <h1>{{' '.join(person.name).title()}}</h1>
+              <p>{{', '.join(person.aliases)}}</p>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+
+      <!-- details -->
+      <div class="col-md-8">
+        {% for person in people %}
+          {% if person.id == id %}
+            <div class="name">
+              <h1>{{' '.join(person.name).title()}}</h1>
+              <p>
+                {% for item in person.tags %}
+                  <a href="/people/tag/{{item}}">{{item}}</a>
+                  {% if not loop.last %}
+                    <span>, </span>
+                  {% endif %}
+                {% endfor %}
+              </p>
+            </div>
+
+            <div class="panel panel-default">
+              <div class="panel-heading">Information</div>
+              <ul class="list-group">
+                {% for k,v in person.iteritems()|sort if k not in ["id"] %}
+                  <li class="list-group-item">
+                    {{k.replace('-', ' ').title()}}: 
+                    {% if not v.append %} 
+                      {{ v }}
+                    {% else %}
+                      {{ ', '.join(v) }}
+                    {% endif %}
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+
+          {% endif %}
+        {% endfor %}
+      </div>
+
+    </div>
+  </div>
+{% endif %}
+
+<!-- a tag -->
+{% if tag is defined %}
+  <div class="panel panel-default people page">
+    <div class="panel-heading">
+      People with tag '{{ tag }}'
+    </div>
+      <ul class="list-group list">
+        {% for person in people if tag in person.tags %}
+          <li class="list-group-item">
+            <a href="/people/{{person.id}}">
+              <h1>{{' '.join(person.name).title()}}</h1>
+              <p>{{', '.join(person.aliases)}}</p>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+  </div>
+{% endif %}
+          
+ 
+{% endblock %}
+{% block script %}
+  <script>
+    // hide all empty panels
+    $("div.panel ul.list-group").each(function(c){
+      if ( $(this).children().length == 0 ) {
+        $(this).parent().hide();
+      }
+    });
+  </script>
+{% endblock %}

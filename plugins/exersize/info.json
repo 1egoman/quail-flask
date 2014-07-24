@@ -2,5 +2,6 @@
   "name": "excersize",
   "desc": "track my physical activity",
   "author": "Ryan Gaus",
-  "plugin": "ExersizePlugin"
+  "plugin": "ExersizePlugin",
+  "color": "green"
 }

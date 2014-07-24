@@ -85,7 +85,7 @@ class CalPlugin(Plugin):
         timeq = None
         when = [w for w in self.query if type(w) == dict and w["type"] == "time"]
         if len(when):
-          timeq = when[0]["when"]
+          timeq = dt.datetime.strptime(when[0]["when"], '%c')
         else:
           timeq = None
 
@@ -93,11 +93,13 @@ class CalPlugin(Plugin):
         # delete it
         for e in self.app.calender.events:
           if e["name"].strip() == name["name"].strip():
-            self.app.calender.events.remove(e)
-            self.app.calender.sync()
-            self.resp["text"] = "Deleted %s" % name["name"]
-            self.resp["status"] = STATUS_OK
-            return
+            f = dt.datetime.strptime(e["when"], '%c')
+            if (timeq and timeq.day == f.day and timeq.month == f.month and timeq.year == f.year) or not timeq:
+              self.app.calender.events.remove(e)
+              self.app.calender.sync()
+              self.resp["text"] = "Deleted %s" % name["name"]
+              self.resp["status"] = STATUS_OK
+              return
 
       except IndexError, KeyError:
         if name and type(name) == dict:

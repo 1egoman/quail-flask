@@ -9,7 +9,7 @@
 
 {% endblock contents_class %}
 {% block contents %}
-<!-- {{ query[0]|tojson }} -->
+{{ query[0]|tojson }}
 <h1 class="big">Quail says...</h1>
 <h1 class="big queryresponse">
   {{ query[0]["text"] }}

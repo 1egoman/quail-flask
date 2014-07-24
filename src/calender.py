@@ -38,8 +38,6 @@ class Calender(object):
     with open( self.cfgpath, 'w' ) as f:
       f.write( dumps(self.events, indent=2) )
 
-  def as_html(self):
-    pass
 
   def where(self, name=None, when=None, where=None):
     gooditems = []

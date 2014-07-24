@@ -45,6 +45,13 @@ class PeopleContainer(object):
   def add_person(self, **person):
     """ Add a new person to the list of known people """
     person = PERSONTEMPLATE.copy().update(person)
+
+    # add id to person
+    try:
+      person["id"] = self.data[-1]["id"] + 1
+    except KeyError:
+      person["id"] = 0
+
     self.data.append(person)
 
 

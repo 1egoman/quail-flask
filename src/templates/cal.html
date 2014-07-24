@@ -7,12 +7,31 @@
     <!-- calender -->
     <div class="page cal" ng-controller="CalController as CalCtrl">
       <div class="page-header">
-        Calendar for {{ title }}
+        <!-- Calendar for {{ title }} -->
         <a href="/cal" class="btn btn-primary">Now</a>
+
+        <div class="btn-group">
+          <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+            {{ request.args.get("tags") or "All Tags" }} <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="/cal/{{now.month}}/{{now.year}}">All Tags</a></li>
+            {% for t in alltags %}
+              <li><a href="?tags={{t}}">{{t}}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+
         <ul class="pagination" style="float: right; font-size: 0.8em; margin: 0px;">
-          <li><a href="/cal/{% if now.month > 1 %}{{now.month-1}}/{{now.year}}{% else %}12/{{now.year-1}}{% endif %}">&laquo;</a></li>
-          <li class="active"><a href>{{now.month}}/{{now.year}}</a></li>
-          <li><a href="/cal/{% if now.month < 12 %}{{now.month+1}}/{{now.year}}{% else %}1/{{now.year+1}}{% endif %}">&raquo;</a></li>
+          <li>
+            <a href="/cal/{% if now.month > 1 %}{{now.month-1}}/{{now.year}}{% else %}12/{{now.year-1}}{% endif %}">&laquo;</a>
+          </li>
+          <li class="active">
+            <a href>{{now.month}}/{{now.year}}</a>
+          </li>
+          <li>
+            <a href="/cal/{% if now.month < 12 %}{{now.month+1}}/{{now.year}}{% else %}1/{{now.year+1}}{% endif %}">&raquo;</a>
+          </li>
         </ul>
       </div>
       <div class="page-content">
@@ -35,37 +54,39 @@
 
                 {% for day in week %}
                   <!-- each day -->
-                  <div class="cal-cell1 cal-cell" data-cal-row="-day2" ng-repeat="day in week" data-events="{{ day.events }}">
+                  <div class="cal-cell1 cal-cell {% if day.day == now.day and dt.datetime.now().month == now.month and dt.datetime.now().year == now.year%}today{% endif %}" data-cal-row="-day2" ng-repeat="day in week" data-events="{{ day.events }}">
                     <div class="cal-month-day cal-day-{{day.month}}month cal-month-first-row">
 
                       <button type="button" class="close plus" data-day="{{now.month}}/{{day.day}}/{{now.year}}">
                         <span class="glyphicon glyphicon-new-window"></span>
                       </button>
 
-                      <span class="pull-right" data-cal-date="2013-02-25" data-cal-view="day" data-toggle="tooltip" title="" data-original-title="">{{ day.day }}</span>
+                      <span class="pull-right" data-cal-date="{{now.year}}/{{day.month}}/{{now.day}}" data-cal-view="day" data-toggle="tooltip" title="" data-original-title="">{{ day.day }}</span>
 
                       <div class="events-list">
                         {% for evt in day.events %}
-                        <!-- <a href data-event-class="event-warning" class="pull-left event event-warning"></a> -->
-                          <a 
-                          data-event-class="event-{{ evt.color or "yellow" }}" 
-                          class="pull-left event event-{{ evt.color or "yellow" }}"  
-                          data-toggle="popover" 
-                          data-title="{{ evt.name }}" 
-                          data-day="{{ evt.when }}"
-                          data-content="
-                          <strong>When:</strong> {{ evt.when }} 
-                          {% if evt.where %}
-                            <br/>
-                            <strong>Where:</strong> {{ evt.where }} 
+                          {% if ( request.args.get("tags") is defined and request.args.get("tags") and evt.has_key("tags") and bitwiseand(aset(evt["tags"]), aset(request.args.get("tags").split("|")))  ) or not request.args.get("tags") %}
+                          <!-- <a href data-event-class="event-warning" class="pull-left event event-warning"></a> -->
+                            <a 
+                            data-event-class="event-{{ evt.color or "yellow" }}" 
+                            class="pull-left event event-{{ evt.color or "yellow" }}"  
+                            data-toggle="popover" 
+                            data-title="{{ evt.name }}" 
+                            data-day="{{ evt.when }}"
+                            data-content="
+                            <strong>When:</strong> {{ evt.when }} 
+                            {% if evt.where %}
+                              <br/>
+                              <strong>Where:</strong> {{ evt.where }} 
+                            {% endif %}
+                            {% if evt.tags %}
+                              <br/>
+                              <strong>Tags:</strong> {{ ', '.join(evt.tags) }} 
+                            {% endif %}">
+                              {{ evt.name }}
+                              <span class="delete-event" data-name="{{ evt.name }}" data-day="{{now.month}}/{{day.day}}/{{now.year}}">×</span>
+                            </a>
                           {% endif %}
-                          {% if evt.tags %}
-                            <br/>
-                            <strong>Tags:</strong> {{ ', '.join(evt.tags) }} 
-                          {% endif %}">
-                            {{ evt.name }}
-                            <span class="delete-event" data-name="{{ evt.name }}">×</span>
-                          </a>
                         {% endfor %}
 
                       </div>
@@ -84,10 +105,6 @@
         </div>
       </div>
     </div>
-
-
-          
- 
 {% endblock %}
 {% block script %}
     <script>
@@ -101,7 +118,7 @@
     });
 
     $("a span.delete-event").click(function( evt ) {
-      var day = "cal delete "+$(this).attr("data-name")
+      var day = "cal delete "+$(this).attr("data-name")+" "+$(this).attr("data-day")
       $("form.navbar-form input[type=text]").val( $("form.navbar-form input[type=text]").val()+day );
       $("form.navbar-form input[type=text]").focus();
     });

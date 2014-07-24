@@ -38,7 +38,7 @@ h1.big.queryresponse:before, h1.big.queryresponse:after { content: '"'; }
   </div>
   <div class="page-content">
     <!-- {{ query }} -->
-    <h1 class="big">Quail says...</h1>
+    <h1 class="big">Quail ({{ query[0].type }}) says...</h1>
     <h1 class="big queryresponse">
       {{ query[0]["text"] }}
     </h1>

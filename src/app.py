@@ -21,7 +21,7 @@ class App(object):
   """ Contains the main flask instance """
 
   # quail version
-  VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH = 1, 6, 'B'
+  VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH = 1, 7, 'A'
 
   def __init__(self, **flask_args):
 
@@ -221,8 +221,18 @@ class App(object):
       except IndexError: pass
 
 
+    # get all unique calenders
+    taglist = []
+    for i in self.calender.events:
+      if i.has_key("tags"):
+        for t in i["tags"]:
+          if t not in taglist:
+            taglist.append( t )
+
+
+
     # render output
-    return render_template( os.path.join(root, "cal.html"), events=weeksout, title=now.strftime("%B %Y"),now=now)
+    return render_template( os.path.join(root, "cal.html"), events=weeksout, title=now.strftime("%B %Y"), now=now, dt=datetime, alltags=taglist, aset=set, bitwiseand=lambda a, b: a&b)
 
   def web(self):
     """ Web interface for quail interaction """
@@ -233,6 +243,13 @@ class App(object):
       return render_template( os.path.join(root, "welcome.html"))
     else:
       return render_template( os.path.join(root, "index.html"))
+
+  def web_people(self, pid=0, tag=None):
+    """ shows the 'people' section """
+    if tag:
+      return render_template("people.html", people=self.people, tag=tag)
+    else:
+      return render_template("people.html", people=self.people, id=pid)
 
   def updatequaildotjson(self):
     """ Update config/quail.json file """
@@ -275,6 +292,10 @@ class App(object):
     self.flask.add_url_rule("/cal", "web_cal", view_func=self.calendar)
     self.flask.add_url_rule("/cal/<int:month>", "web_cal", view_func=self.calendar)
     self.flask.add_url_rule("/cal/<int:month>/<int:year>", "web_cal", view_func=self.calendar)
+
+    self.flask.add_url_rule("/people", "web_people", view_func=self.web_people)
+    self.flask.add_url_rule("/people/<int:pid>", "web_people", view_func=self.web_people)
+    self.flask.add_url_rule("/people/tag/<tag>", "web_people", view_func=self.web_people)
 
     self.flask.add_url_rule("/search", "query_search", view_func=self.web_query)
     self.flask.add_url_rule("/quail.json", "updatequaildotjson", view_func=self.updatequaildotjson)
