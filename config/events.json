@@ -1,13 +1,13 @@
 [
   {
-    "when": "Sun Jul 20 18:00:00 2014", 
     "where": "location", 
+    "when": "Sun Jul 20 18:00:00 2014", 
     "name": "okay"
   }, 
   {
     "color": "green", 
-    "where": null, 
     "when": "Tue Jul 22 21:59:41 2014", 
+    "where": null, 
     "name": "Walking", 
     "tags": [
       "walk", 

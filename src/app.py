@@ -215,7 +215,7 @@ class App(object):
 
     # prepend previous month days
     for i in xrange( 0, int(datetime.date(now.year, now.month, 1).strftime('%w')) ):
-      events_for_day = self.calender.events.year(now.year).month(now.month-1).day(i+1)
+      events_for_day = self.calender.events.year(now.year).month(now.month-1).day(day_in_last_month-i)
 
       today = {"day": day_in_last_month-i, "events": events_for_day, "month": "out"}
       out.insert(0, today)
