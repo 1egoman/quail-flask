@@ -23,7 +23,7 @@ class App(object):
   """ Contains the main flask instance """
 
   # quail version
-  VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH = 1, 7, 'B'
+  VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH = 1, 7, 'C'
 
   def __init__(self, **flask_args):
 
