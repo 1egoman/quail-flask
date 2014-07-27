@@ -1,5 +1,7 @@
 from flask import *#Flask, Response, url_for, jsonify, redirect, request, redner_template
 from werkzeug.utils import secure_filename
+from flask.sessions import SessionInterface, SessionMixin
+
 from json import dumps, loads
 from temboo.core.session import TembooSession
 import os
@@ -21,7 +23,7 @@ class App(object):
   """ Contains the main flask instance """
 
   # quail version
-  VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH = 1, 7, 'A'
+  VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH = 1, 7, 'B'
 
   def __init__(self, **flask_args):
 
@@ -50,6 +52,15 @@ class App(object):
 
     # create stack
     self.stack = []
+
+    # user login info
+    # self.login = [{
+    #   "user": "root", 
+    #   "pass": "password",
+    #   "access": "all"
+    # }]
+    self.login = []
+    self.login_as = None
 
     # start listener thread
     thrd = listener.listenerThread(self, self.manager.plugins)
@@ -155,6 +166,9 @@ class App(object):
   def calendar(self, month=0, year=0):
     """ Web interface for quail interaction """
     root = ""
+
+    # authorization?
+    if len(self.login) and self.login_as == None: return self.web()
     
     # format events to be displayed
     out = []
@@ -237,15 +251,39 @@ class App(object):
   def web(self):
     """ Web interface for quail interaction """
     root = ""
+
+    if len(self.login):
+      # post, trying to log in
+      u, p = request.form.get('user') or None, request.form.get('pass') or None
+      print u, p
+      for cred in self.login:
+        if cred["user"] == u and cred["pass"] == p:
+          self.login_as = cred["user"]
+          return render_template( os.path.join(root, "index.html"), user=self.login_as or None)
+
+      return render_template( os.path.join(root, "login.html"))
     
-    # first time?
-    if not self.config.has_key("welcome") or (self.config.has_key("welcome") and not self.config["welcome"]):
-      return render_template( os.path.join(root, "welcome.html"))
     else:
-      return render_template( os.path.join(root, "index.html"))
+
+      # first time?
+      if not self.config.has_key("welcome") or (self.config.has_key("welcome") and not self.config["welcome"]):
+        return render_template( os.path.join(root, "welcome.html"))
+
+        # logged in?
+      elif len(self.login) > 0:
+        # log in
+        return render_template( os.path.join(root, "login.html"))
+
+      else:
+        return render_template( os.path.join(root, "index.html"), user=self.login_as or None)
+
 
   def web_people(self, pid=0, tag=None):
     """ shows the 'people' section """
+
+    # authorization?
+    if len(self.login) and self.login_as == None: return self.web()
+
     if tag:
       return render_template("people.html", people=self.people, tag=tag)
     else:
@@ -270,8 +308,15 @@ class App(object):
     return "NO DATA OR PERMISSION DENIED"
 
   def web_query(self):
+    # authorization?
+    if len(self.login) and self.login_as == None: return self.web()
+
     q = self.do_query( request.args.get('q'), local=True)
     return render_template( "query.html", query=loads(q.data) )
+
+  def logout(self): 
+    self.login_as = None
+    return render_template( os.path.join("login.html"))
     
   def run(self, **flask_args):
     """ Sets all the flask options behind the scenes, and starte Flask """
@@ -287,7 +332,8 @@ class App(object):
     self.flask.add_url_rule("/v2/<secret>/upload", "upload", methods=["POST"], view_func=self.upload_resource)
 
     # web interface
-    self.flask.add_url_rule("/", "newweb", view_func=self.web)
+    self.flask.add_url_rule("/", "newweb", methods=["GET", "POST"], view_func=self.web)
+    self.flask.add_url_rule("/logout", "weblogout", methods=["GET", "POST"], view_func=self.logout)
 
     self.flask.add_url_rule("/cal", "web_cal", view_func=self.calendar)
     self.flask.add_url_rule("/cal/<int:month>", "web_cal", view_func=self.calendar)

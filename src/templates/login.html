@@ -1,0 +1,18 @@
+{% extends "header.html" %}
+{% block style %}
+  <style>
+  input { margin: 4px; }
+  </style>
+{% endblock %}
+{% block body %}
+<div class="page">
+  <div style="width: 500px; margin: 24px auto;">
+    <h3>Log in</h3>
+    <form method="post" action="/">
+      <input type="text" name="user" class="form-control" placeholder="Username"/>
+      <input type="text" name="pass" class="form-control" placeholder="Password"/>
+      <input class="btn btn-primary" type="submit"/>
+    </form>
+  </div>
+</div>
+{% endblock %}

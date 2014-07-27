@@ -4,5 +4,7 @@
   "secret": "abc",
   "upload-folder": "uploads",
   "wa-api-key": "4W736E-Y82E88RJYQ",
+  "temboo-user": "1egoman",
+  "temboo-pass": "c50f79fd21574014b414907a7289043a",
   "welcome": true
 }

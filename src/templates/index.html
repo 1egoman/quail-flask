@@ -4,7 +4,9 @@
 {% endblock %}
 {% block body %}
 
-          
+<div class="page">
+  {% if user is defined and user %}<a href="/logout" >Logout</a>{% endif %}
+</div>
  
 {% endblock %}
 {% block script %}
