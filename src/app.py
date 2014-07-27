@@ -270,7 +270,7 @@ class App(object):
         return render_template( os.path.join(root, "welcome.html"))
 
         # logged in?
-      elif len(self.login) > 0:
+      elif len(self.login) > 0 and self.login_as == None:
         # log in
         return render_template( os.path.join(root, "login.html"))
 
